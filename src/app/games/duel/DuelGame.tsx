@@ -197,12 +197,13 @@ export default function DuelGame() {
       <div className="flex flex-col gap-4">
         <button
           type="button"
-          onClick={() => {
+          onPointerDown={(e) => {
+            e.preventDefault();
             if (phaseRef.current === "playing") fire();
             else reset();
           }}
-          className="relative overflow-hidden border border-line bg-surface text-left"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%" }}
+          className="relative overflow-hidden border border-line bg-surface text-left touch-manipulation select-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation" }}
           aria-label="Duel"
         >
           {/* Mid-field line */}
@@ -266,8 +267,37 @@ export default function DuelGame() {
             </span>
           )}
         </button>
+        <div className="flex gap-3 lg:hidden">
+          <HoldButton
+            onPress={() => keys.current.add("ArrowUp")}
+            onRelease={() => keys.current.delete("ArrowUp")}
+            label="Up"
+          >
+            ↑
+          </HoldButton>
+          <button
+            type="button"
+            onPointerDown={(e) => {
+              e.preventDefault();
+              if (phaseRef.current === "playing") fire();
+              else reset();
+            }}
+            className="flex-1 border border-line bg-surface py-4 font-mono text-xs uppercase tracking-[0.2em] touch-manipulation select-none"
+            style={{ touchAction: "manipulation" }}
+            aria-label="Fire"
+          >
+            Fire
+          </button>
+          <HoldButton
+            onPress={() => keys.current.add("ArrowDown")}
+            onRelease={() => keys.current.delete("ArrowDown")}
+            label="Down"
+          >
+            ↓
+          </HoldButton>
+        </div>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          ↑ ↓ or W S to dodge · Space to fire
+          ↑ ↓ or W S to dodge · Space or tap to fire
         </p>
       </div>
 
@@ -288,6 +318,40 @@ export default function DuelGame() {
         </div>
       </div>
     </div>
+  );
+}
+
+function HoldButton({
+  onPress,
+  onRelease,
+  label,
+  children,
+}: {
+  onPress: () => void;
+  onRelease: () => void;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onPointerDown={(e) => {
+        e.preventDefault();
+        e.currentTarget.setPointerCapture(e.pointerId);
+        onPress();
+      }}
+      onPointerUp={(e) => {
+        e.preventDefault();
+        onRelease();
+      }}
+      onPointerCancel={() => onRelease()}
+      onPointerLeave={() => onRelease()}
+      aria-label={label}
+      className="w-20 border border-line bg-surface py-4 font-mono text-lg touch-manipulation select-none active:bg-line"
+      style={{ touchAction: "none" }}
+    >
+      {children}
+    </button>
   );
 }
 

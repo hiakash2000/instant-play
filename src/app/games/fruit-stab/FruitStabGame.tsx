@@ -131,9 +131,12 @@ export default function FruitStabGame() {
       <div className="flex flex-col gap-4">
         <button
           type="button"
-          onClick={throwKnife}
-          className="relative overflow-hidden border border-line bg-surface"
-          style={{ width: WIDTH, height: HEIGHT }}
+          onPointerDown={(e) => {
+            e.preventDefault();
+            throwKnife();
+          }}
+          className="relative overflow-hidden border border-line bg-surface touch-manipulation select-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation" }}
           aria-label="Throw"
         >
           <span

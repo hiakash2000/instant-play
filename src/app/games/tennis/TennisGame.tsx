@@ -173,14 +173,49 @@ export default function TennisGame() {
     };
   }, [start]);
 
+  const dragRef = useRef(false);
+  const setPaddleFromPointer = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const sy = HEIGHT / rect.height;
+    const y = (e.clientY - rect.top) * sy - PADDLE_H / 2;
+    playerY.current = Math.max(0, Math.min(HEIGHT - PADDLE_H, y));
+    force((n) => (n + 1) & 0xffff);
+  }, []);
+  const onBoardPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      dragRef.current = true;
+      if (phaseRef.current !== "playing") {
+        start();
+        return;
+      }
+      setPaddleFromPointer(e);
+    },
+    [start, setPaddleFromPointer],
+  );
+  const onBoardPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      if (!dragRef.current || phaseRef.current !== "playing") return;
+      setPaddleFromPointer(e);
+    },
+    [setPaddleFromPointer],
+  );
+  const endDrag = useCallback(() => {
+    dragRef.current = false;
+  }, []);
+
   return (
     <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
         <button
           type="button"
-          onClick={start}
-          className="relative overflow-hidden border border-line bg-surface select-none"
-          style={{ width: WIDTH, height: HEIGHT }}
+          onPointerDown={onBoardPointerDown}
+          onPointerMove={onBoardPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          className="relative overflow-hidden border border-line bg-surface select-none touch-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
           aria-label="Tennis"
         >
           {Array.from({ length: 16 }).map((_, i) => (
@@ -232,7 +267,7 @@ export default function TennisGame() {
           )}
         </button>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          ↑ ↓ or W/S · space resets the score
+          ↑ ↓ or W/S · drag vertically · space resets the score
         </p>
       </div>
 

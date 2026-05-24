@@ -243,6 +243,29 @@ export default function PacmanGame() {
     return () => window.clearInterval(id);
   }, [phase, initLevel]);
 
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const onBoardPointerDown = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
+    touchStartRef.current = { x: e.clientX, y: e.clientY };
+  }, []);
+  const onBoardPointerUp = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      const s = touchStartRef.current;
+      touchStartRef.current = null;
+      if (!s) return;
+      const dx = e.clientX - s.x;
+      const dy = e.clientY - s.y;
+      const adx = Math.abs(dx);
+      const ady = Math.abs(dy);
+      if (adx < 14 && ady < 14) {
+        if (phaseRef.current !== "playing") start();
+        return;
+      }
+      if (phaseRef.current !== "playing") return;
+      pac.current.queued = adx > ady ? (dx > 0 ? "right" : "left") : dy > 0 ? "down" : "up";
+    },
+    [start],
+  );
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (phaseRef.current !== "playing") {
@@ -285,9 +308,11 @@ export default function PacmanGame() {
       <div className="flex flex-col gap-4">
         <button
           type="button"
-          onClick={start}
-          className="relative overflow-hidden border border-line bg-surface select-none"
-          style={{ width: WIDTH, height: HEIGHT }}
+          onPointerDown={onBoardPointerDown}
+          onPointerUp={onBoardPointerUp}
+          onPointerCancel={() => (touchStartRef.current = null)}
+          className="relative overflow-hidden border border-line bg-surface select-none touch-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
           aria-label="Pacman"
         >
           {wallCells.map((w) => (
@@ -362,7 +387,7 @@ export default function PacmanGame() {
           )}
         </button>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          Arrows or WASD · turn at junctions · eat every dot
+          Arrows, WASD, or swipe · turn at junctions · eat every dot
         </p>
       </div>
 

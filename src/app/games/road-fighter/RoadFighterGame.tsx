@@ -153,6 +153,38 @@ export default function RoadFighterGame() {
     };
   }, [start]);
 
+  const dragRef = useRef(false);
+  const setPlayerFromPointer = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const sx = WIDTH / rect.width;
+    const x = (e.clientX - rect.left) * sx - CAR_W / 2;
+    playerX.current = Math.max(ROAD_LEFT, Math.min(ROAD_RIGHT - CAR_W, x));
+    force((n) => (n + 1) & 0xffff);
+  }, []);
+  const onBoardPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      dragRef.current = true;
+      if (phaseRef.current !== "playing") {
+        start();
+        return;
+      }
+      setPlayerFromPointer(e);
+    },
+    [start, setPlayerFromPointer],
+  );
+  const onBoardPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      if (!dragRef.current || phaseRef.current !== "playing") return;
+      setPlayerFromPointer(e);
+    },
+    [setPlayerFromPointer],
+  );
+  const endDrag = useCallback(() => {
+    dragRef.current = false;
+  }, []);
+
   const stripes: number[] = [];
   for (
     let y = -STRIPE_GAP + stripeOffset.current;
@@ -167,9 +199,12 @@ export default function RoadFighterGame() {
       <div className="flex flex-col gap-4">
         <button
           type="button"
-          onClick={start}
-          className="relative overflow-hidden border border-line bg-surface select-none"
-          style={{ width: WIDTH, height: HEIGHT }}
+          onPointerDown={onBoardPointerDown}
+          onPointerMove={onBoardPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          className="relative overflow-hidden border border-line bg-surface select-none touch-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
           aria-label="Drive"
         >
           <span
@@ -227,7 +262,7 @@ export default function RoadFighterGame() {
           )}
         </button>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          ← → or A/D · space to start · don&apos;t hit anyone
+          ← → or A/D · drag on board · don&apos;t hit anyone
         </p>
       </div>
 

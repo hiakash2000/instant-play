@@ -145,9 +145,12 @@ export default function DinoGame() {
       <div className="flex flex-col gap-4">
         <button
           type="button"
-          onClick={jump}
-          className="relative overflow-hidden border border-line bg-surface text-left"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%" }}
+          onPointerDown={(e) => {
+            e.preventDefault();
+            jump();
+          }}
+          className="relative overflow-hidden border border-line bg-surface text-left touch-manipulation select-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation" }}
           aria-label="Jump"
         >
           {/* Ground line */}
@@ -190,7 +193,7 @@ export default function DinoGame() {
           )}
         </button>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          Space, ↑, W, or click to jump
+          Space, ↑, W, or tap to jump
         </p>
       </div>
 

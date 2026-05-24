@@ -66,7 +66,7 @@ export default function AboutMe() {
 
             <div className="mt-6 space-y-4 text-sm leading-relaxed text-muted">
               <p>
-                I&apos;m a software engineer who likes shipping things
+                I&apos;m a software engineer who likes shipping small things
                 end-to-end. This site is a portfolio piece — a single Next.js
                 app hosting a couple dozen browser games behind one consistent
                 UI, with a dark/light theme and a single tap to play.

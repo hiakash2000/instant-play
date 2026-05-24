@@ -46,6 +46,7 @@ export default function VampireSurvivorsGame() {
   const [, force] = useState(0);
 
   const phaseRef = useRef(phase);
+  const touchVecRef = useRef<{ x: number; y: number } | null>(null);
   const playerRef = useRef<Vec>({ x: WIDTH / 2, y: HEIGHT / 2 });
   const enemiesRef = useRef<Enemy[]>([]);
   const bulletsRef = useRef<Bullet[]>([]);
@@ -95,6 +96,11 @@ export default function VampireSurvivorsGame() {
       if (keys.has("s") || keys.has("arrowdown")) dy += 1;
       if (keys.has("a") || keys.has("arrowleft")) dx -= 1;
       if (keys.has("d") || keys.has("arrowright")) dx += 1;
+      const t = touchVecRef.current;
+      if (t && dx === 0 && dy === 0) {
+        dx = t.x;
+        dy = t.y;
+      }
       const len = Math.hypot(dx, dy);
       if (len > 0) {
         p.x = Math.max(10, Math.min(WIDTH - 10, p.x + (dx / len) * stats.speed));
@@ -229,6 +235,41 @@ export default function VampireSurvivorsGame() {
     };
   }, []);
 
+  const updateTouchVec = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const sx = WIDTH / rect.width;
+    const sy = HEIGHT / rect.height;
+    const tx = (e.clientX - rect.left) * sx;
+    const ty = (e.clientY - rect.top) * sy;
+    const p = playerRef.current;
+    const dx = tx - p.x;
+    const dy = ty - p.y;
+    if (Math.hypot(dx, dy) < 8) {
+      touchVecRef.current = null;
+    } else {
+      touchVecRef.current = { x: dx, y: dy };
+    }
+  }, []);
+  const onBoardPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (phaseRef.current !== "playing") return;
+      e.currentTarget.setPointerCapture(e.pointerId);
+      updateTouchVec(e);
+    },
+    [updateTouchVec],
+  );
+  const onBoardPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!touchVecRef.current && e.buttons === 0 && e.pointerType !== "touch") return;
+      if (phaseRef.current !== "playing") return;
+      if (e.pointerType === "touch" || e.buttons > 0) updateTouchVec(e);
+    },
+    [updateTouchVec],
+  );
+  const endTouch = useCallback(() => {
+    touchVecRef.current = null;
+  }, []);
+
   const pickUpgrade = (u: Upgrade) => {
     const oldMax = statsRef.current.maxHp;
     statsRef.current = u.apply(statsRef.current);
@@ -244,8 +285,13 @@ export default function VampireSurvivorsGame() {
     <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
         <div
-          className="relative overflow-hidden border border-line bg-surface"
-          style={{ width: WIDTH, height: HEIGHT }}
+          onPointerDown={onBoardPointerDown}
+          onPointerMove={onBoardPointerMove}
+          onPointerUp={endTouch}
+          onPointerCancel={endTouch}
+          onPointerLeave={endTouch}
+          className="relative overflow-hidden border border-line bg-surface select-none touch-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
         >
           {enemiesRef.current.map((e, i) => (
             <span
@@ -332,7 +378,7 @@ export default function VampireSurvivorsGame() {
           )}
         </div>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          WASD / arrows to move · weapon fires automatically
+          WASD / arrows to move · or touch and hold to move toward your finger · weapon fires automatically
         </p>
       </div>
 

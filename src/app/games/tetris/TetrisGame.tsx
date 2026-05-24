@@ -281,6 +281,75 @@ export default function TetrisGame() {
     return () => window.removeEventListener("keydown", onKey);
   }, [start, tryMove, tryRotate, hardDrop]);
 
+  const touchRef = useRef<{
+    startX: number;
+    startY: number;
+    lastX: number;
+    lastY: number;
+    startT: number;
+    moved: boolean;
+    cellPx: number;
+  } | null>(null);
+  const onBoardPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      if (phaseRef.current !== "playing") {
+        start();
+        return;
+      }
+      const rect = e.currentTarget.getBoundingClientRect();
+      touchRef.current = {
+        startX: e.clientX,
+        startY: e.clientY,
+        lastX: e.clientX,
+        lastY: e.clientY,
+        startT: performance.now(),
+        moved: false,
+        cellPx: Math.max(12, rect.width / COLS),
+      };
+    },
+    [start],
+  );
+  const onBoardPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const t = touchRef.current;
+    if (!t || phaseRef.current !== "playing") return;
+    const dx = e.clientX - t.lastX;
+    const dy = e.clientY - t.lastY;
+    let stepped = false;
+    if (Math.abs(dx) >= t.cellPx) {
+      const steps = Math.trunc(dx / t.cellPx);
+      for (let i = 0; i < Math.abs(steps); i++) tryMove(steps > 0 ? 1 : -1, 0);
+      t.lastX += steps * t.cellPx;
+      stepped = true;
+    }
+    if (dy >= t.cellPx) {
+      const steps = Math.trunc(dy / t.cellPx);
+      for (let i = 0; i < steps; i++) tryMove(0, 1);
+      t.lastY += steps * t.cellPx;
+      stepped = true;
+    }
+    if (stepped) t.moved = true;
+  }, [tryMove]);
+  const onBoardPointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      const t = touchRef.current;
+      touchRef.current = null;
+      if (!t || phaseRef.current !== "playing") return;
+      const dx = e.clientX - t.startX;
+      const dy = e.clientY - t.startY;
+      const dt = performance.now() - t.startT;
+      if (!t.moved && Math.abs(dx) < t.cellPx && Math.abs(dy) < t.cellPx) {
+        tryRotate();
+        return;
+      }
+      if (dy > t.cellPx * 4 && dt < 220) {
+        hardDrop();
+      }
+    },
+    [tryRotate, hardDrop],
+  );
+
   const display = board.current.map((row) => row.slice()) as Cell[][];
   if (phase !== "idle") {
     const shape = getShape(piece.current);
@@ -300,8 +369,12 @@ export default function TetrisGame() {
     <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
         <div
-          className="relative overflow-hidden border border-line bg-surface select-none"
-          style={{ width: WIDTH, height: HEIGHT }}
+          onPointerDown={onBoardPointerDown}
+          onPointerMove={onBoardPointerMove}
+          onPointerUp={onBoardPointerUp}
+          onPointerCancel={() => (touchRef.current = null)}
+          className="relative overflow-hidden border border-line bg-surface select-none touch-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
         >
           {display.map((row, r) =>
             row.map((cell, c) => (
@@ -329,7 +402,7 @@ export default function TetrisGame() {
           )}
         </div>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          ← → move · ↓ soft drop · ↑ rotate · space hard drop
+          ← → move · ↓ soft drop · ↑ rotate · space hard drop · drag/tap on touch
         </p>
       </div>
 

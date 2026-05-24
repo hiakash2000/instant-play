@@ -125,12 +125,50 @@ export default function SubwaySurfersGame() {
     return () => window.removeEventListener("keydown", onKey);
   }, [reset]);
 
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const onBoardPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    touchStartRef.current = { x: e.clientX, y: e.clientY };
+  }, []);
+  const onBoardPointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      const s = touchStartRef.current;
+      touchStartRef.current = null;
+      if (!s) return;
+      const dx = e.clientX - s.x;
+      const dy = e.clientY - s.y;
+      const adx = Math.abs(dx);
+      const ady = Math.abs(dy);
+      if (adx < 18 && ady < 18) {
+        if (phaseRef.current !== "playing") {
+          reset();
+        } else if (jumpRef.current === 0) {
+          jumpRef.current = 28;
+        }
+        return;
+      }
+      if (phaseRef.current !== "playing") return;
+      if (adx > ady) {
+        laneRef.current =
+          dx > 0
+            ? Math.min(LANES - 1, laneRef.current + 1)
+            : Math.max(0, laneRef.current - 1);
+      } else if (dy < 0) {
+        if (jumpRef.current === 0) jumpRef.current = 28;
+      }
+      force((n) => (n + 1) & 0xffff);
+    },
+    [reset],
+  );
+
   return (
     <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
         <div
-          className="relative overflow-hidden border border-line bg-surface"
-          style={{ width: WIDTH, height: HEIGHT }}
+          onPointerDown={onBoardPointerDown}
+          onPointerUp={onBoardPointerUp}
+          onPointerCancel={() => (touchStartRef.current = null)}
+          className="relative overflow-hidden border border-line bg-surface touch-none select-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
         >
           {[1, 2].map((i) => (
             <span
@@ -173,7 +211,7 @@ export default function SubwaySurfersGame() {
           )}
         </div>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          ← → swap lanes · ↑ or space to jump barriers
+          ← → swap lanes · ↑/space to jump · or swipe left/right/up
         </p>
       </div>
 

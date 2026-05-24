@@ -124,7 +124,8 @@ export default function DuckHuntGame() {
   }, [phase, score]);
 
   const onBoardClick = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      e.preventDefault();
       if (phaseRef.current !== "playing") {
         start();
         return;
@@ -165,9 +166,9 @@ export default function DuckHuntGame() {
       <div className="flex flex-col gap-4">
         <button
           type="button"
-          onClick={onBoardClick}
-          className="relative overflow-hidden border border-line bg-surface"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", cursor: "crosshair" }}
+          onPointerDown={onBoardClick}
+          className="relative overflow-hidden border border-line bg-surface touch-manipulation select-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", cursor: "crosshair", touchAction: "manipulation" }}
           aria-label="Shoot"
         >
           {/* Bush along the bottom */}

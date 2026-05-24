@@ -138,6 +138,53 @@ export default function SnakeGame() {
     return () => window.clearInterval(id);
   }, [phase, tick]);
 
+  const applyDirection = useCallback(
+    (mapped: Dir) => {
+      if (phaseRef.current === "idle") {
+        dirRef.current = mapped;
+        setDir(mapped);
+        setPhase("playing");
+        return;
+      }
+      if (phaseRef.current === "playing") {
+        if (mapped !== OPPOSITE[dirRef.current]) {
+          queuedDirRef.current = mapped;
+        }
+      }
+    },
+    [],
+  );
+
+  const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
+  const onBoardPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    touchStartRef.current = { x: e.clientX, y: e.clientY, t: performance.now() };
+  }, []);
+  const onBoardPointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      const start = touchStartRef.current;
+      touchStartRef.current = null;
+      if (!start) return;
+      const dx = e.clientX - start.x;
+      const dy = e.clientY - start.y;
+      const adx = Math.abs(dx);
+      const ady = Math.abs(dy);
+      const SWIPE_MIN = 18;
+      if (adx < SWIPE_MIN && ady < SWIPE_MIN) {
+        if (phaseRef.current === "over") {
+          reset();
+        } else if (phaseRef.current === "idle") {
+          setPhase("playing");
+        } else {
+          togglePause();
+        }
+        return;
+      }
+      const mapped: Dir = adx > ady ? (dx > 0 ? "right" : "left") : dy > 0 ? "down" : "up";
+      applyDirection(mapped);
+    },
+    [applyDirection, reset, togglePause],
+  );
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const k = e.key;
@@ -154,17 +201,7 @@ export default function SnakeGame() {
 
       if (mapped) {
         e.preventDefault();
-        if (phaseRef.current === "idle") {
-          dirRef.current = mapped;
-          setDir(mapped);
-          setPhase("playing");
-          return;
-        }
-        if (phaseRef.current === "playing") {
-          if (mapped !== OPPOSITE[dirRef.current]) {
-            queuedDirRef.current = mapped;
-          }
-        }
+        applyDirection(mapped);
         return;
       }
 
@@ -182,7 +219,7 @@ export default function SnakeGame() {
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [reset, togglePause]);
+  }, [reset, togglePause, applyDirection]);
 
   const headKey = `${snake[0].x},${snake[0].y}`;
   const bodyKeys = new Set(snake.slice(1).map((p) => `${p.x},${p.y}`));
@@ -192,8 +229,11 @@ export default function SnakeGame() {
     <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
         <div
-          className="relative w-full max-w-[640px] border border-line bg-surface"
-          style={{ aspectRatio: `${COLS} / ${ROWS}` }}
+          onPointerDown={onBoardPointerDown}
+          onPointerUp={onBoardPointerUp}
+          onPointerCancel={() => (touchStartRef.current = null)}
+          className="relative w-full max-w-[640px] border border-line bg-surface touch-none select-none"
+          style={{ aspectRatio: `${COLS} / ${ROWS}`, touchAction: "none" }}
         >
           <div
             className="grid h-full w-full"
@@ -245,7 +285,7 @@ export default function SnakeGame() {
         </div>
 
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          Arrows or WASD to steer · Space to {phase === "over" ? "restart" : "pause"}
+          Arrows or WASD to steer · Swipe on the board · Space or tap to {phase === "over" ? "restart" : "pause"}
         </p>
       </div>
 

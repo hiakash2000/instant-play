@@ -134,9 +134,12 @@ export default function FlappyGame() {
       <div className="flex flex-col gap-4">
         <button
           type="button"
-          onClick={flap}
-          className="relative overflow-hidden border border-line bg-surface"
-          style={{ width: WIDTH, height: HEIGHT }}
+          onPointerDown={(e) => {
+            e.preventDefault();
+            flap();
+          }}
+          className="relative overflow-hidden border border-line bg-surface touch-manipulation select-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation" }}
           aria-label="Flap"
         >
           {pipes.current.map((p, i) => (

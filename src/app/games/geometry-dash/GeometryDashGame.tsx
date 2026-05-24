@@ -130,9 +130,12 @@ export default function GeometryDashGame() {
       <div className="flex flex-col gap-4">
         <button
           type="button"
-          onClick={jump}
-          className="relative overflow-hidden border border-line bg-surface"
-          style={{ width: WIDTH, height: HEIGHT }}
+          onPointerDown={(e) => {
+            e.preventDefault();
+            jump();
+          }}
+          className="relative overflow-hidden border border-line bg-surface touch-manipulation select-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation" }}
           aria-label="Jump"
         >
           <span

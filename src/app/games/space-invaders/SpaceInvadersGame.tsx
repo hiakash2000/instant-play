@@ -268,14 +268,55 @@ export default function SpaceInvadersGame() {
     };
   }, [fire, start]);
 
+  const touchRef = useRef<{ startX: number; moved: boolean } | null>(null);
+  const movePlayerToPointer = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const sx = WIDTH / rect.width;
+    const x = (e.clientX - rect.left) * sx - PLAYER_W / 2;
+    playerX.current = Math.max(0, Math.min(WIDTH - PLAYER_W, x));
+    force((n) => (n + 1) & 0xffff);
+  }, []);
+  const onBoardPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      if (phaseRef.current !== "playing") {
+        start();
+        touchRef.current = { startX: e.clientX, moved: true };
+        return;
+      }
+      touchRef.current = { startX: e.clientX, moved: false };
+      movePlayerToPointer(e);
+    },
+    [start, movePlayerToPointer],
+  );
+  const onBoardPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      const t = touchRef.current;
+      if (!t || phaseRef.current !== "playing") return;
+      if (Math.abs(e.clientX - t.startX) > 6) t.moved = true;
+      movePlayerToPointer(e);
+    },
+    [movePlayerToPointer],
+  );
+  const onBoardPointerUp = useCallback(() => {
+    const t = touchRef.current;
+    touchRef.current = null;
+    if (!t) return;
+    if (!t.moved && phaseRef.current === "playing") fire();
+  }, [fire]);
+
   return (
     <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
         <button
           type="button"
-          onClick={start}
-          className="relative overflow-hidden border border-line bg-surface select-none"
-          style={{ width: WIDTH, height: HEIGHT }}
+          onPointerDown={onBoardPointerDown}
+          onPointerMove={onBoardPointerMove}
+          onPointerUp={onBoardPointerUp}
+          onPointerCancel={() => (touchRef.current = null)}
+          className="relative overflow-hidden border border-line bg-surface select-none touch-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
           aria-label="Space Invaders"
         >
           {aliens.current.map((a) => (
@@ -334,7 +375,7 @@ export default function SpaceInvadersGame() {
           )}
         </button>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          ← → or A/D · space to fire (3 in the air max)
+          ← → or A/D · space to fire · drag to move, tap to fire
         </p>
       </div>
 

@@ -198,6 +198,37 @@ export default function JumpUpGame() {
     };
   }, [start]);
 
+  const applyTouchDir = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const left = x < rect.width / 2;
+    pressed.current.left = left;
+    pressed.current.right = !left;
+  }, []);
+  const onBoardPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      if (phaseRef.current !== "playing") {
+        start();
+        return;
+      }
+      applyTouchDir(e);
+    },
+    [start, applyTouchDir],
+  );
+  const onBoardPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      if (phaseRef.current !== "playing") return;
+      if (e.pointerType === "touch" || e.buttons > 0) applyTouchDir(e);
+    },
+    [applyTouchDir],
+  );
+  const endTouch = useCallback(() => {
+    pressed.current.left = false;
+    pressed.current.right = false;
+  }, []);
+
   const viewY = highestY.current - DISPLAY_CHAR_Y;
   const charScreenY = charY.current - viewY;
 
@@ -206,9 +237,13 @@ export default function JumpUpGame() {
       <div className="flex flex-col gap-4">
         <button
           type="button"
-          onClick={start}
-          className="relative overflow-hidden border border-line bg-surface select-none"
-          style={{ width: WIDTH, height: HEIGHT }}
+          onPointerDown={onBoardPointerDown}
+          onPointerMove={onBoardPointerMove}
+          onPointerUp={endTouch}
+          onPointerCancel={endTouch}
+          onPointerLeave={endTouch}
+          className="relative overflow-hidden border border-line bg-surface select-none touch-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
           aria-label="Jump"
         >
           {planks.current.map((p, i) => {
@@ -252,7 +287,7 @@ export default function JumpUpGame() {
           )}
         </button>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          ← → or A/D · space to start · screen wraps at the edges
+          ← → or A/D · tap & hold left/right half on touch · screen wraps at the edges
         </p>
       </div>
 
