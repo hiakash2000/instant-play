@@ -18,18 +18,123 @@ type LockableOrientation = ScreenOrientation & {
   lock?: (orientation: "landscape" | "portrait") => Promise<void>;
 };
 
+const SCORE_LABEL_RE =
+  /^(score|best|lines?|level|time|wave|streak|coins?|hits?|kills?|round|combo|misses?|stars?|chain|distance|moves?|stage|xp|hp|health|points?|hi-?score|highscore|laps?|round|round)$/i;
+
+function isInstructionElement(el: HTMLElement): boolean {
+  const cls = typeof el.className === "string" ? el.className : "";
+  if (!cls.includes("text-muted")) return false;
+  const text = (el.textContent || "").trim();
+  if (text.length < 18) return false;
+  if (/[←→↑↓]/.test(text)) return true;
+  if (text.includes(" · ")) return true;
+  const lower = text.toLowerCase();
+  return (
+    lower.includes("arrows") ||
+    lower.includes("keyboard") ||
+    lower.includes("drag") ||
+    lower.includes("space to ") ||
+    lower.includes("tap to ") ||
+    lower.includes("how to play")
+  );
+}
+
+function collectNonEssential(root: HTMLElement): HTMLElement[] {
+  const hits: HTMLElement[] = [];
+  root.querySelectorAll<HTMLElement>("p").forEach((p) => {
+    if (isInstructionElement(p)) hits.push(p);
+  });
+  root.querySelectorAll<HTMLElement>("div").forEach((card) => {
+    const heading = card.querySelector<HTMLElement>("p, span");
+    if (heading?.textContent?.trim().toLowerCase() === "how to play") {
+      hits.push(card);
+    }
+  });
+  return hits;
+}
+
+function findPlayfield(root: HTMLElement): HTMLElement | null {
+  for (const el of Array.from(root.querySelectorAll<HTMLElement>("div"))) {
+    const cls = typeof el.className === "string" ? el.className : "";
+    if (
+      cls.includes("select-none") &&
+      (cls.includes("touch-none") || cls.includes("touch-manipulation"))
+    ) {
+      return el;
+    }
+  }
+  const canvas = root.querySelector("canvas");
+  if (canvas?.parentElement) return canvas.parentElement;
+  let best: HTMLElement | null = null;
+  let bestArea = 0;
+  root.querySelectorAll<HTMLElement>("div").forEach((d) => {
+    const a = d.clientWidth * d.clientHeight;
+    if (d.clientWidth > 100 && d.clientHeight > 100 && a > bestArea) {
+      bestArea = a;
+      best = d;
+    }
+  });
+  return best;
+}
+
+function findScorePanel(
+  root: HTMLElement,
+  playfield: HTMLElement | null,
+): HTMLElement | null {
+  const candidates = Array.from(root.querySelectorAll<HTMLElement>("div")).reverse();
+  let multiHit: HTMLElement | null = null;
+  let singleHit: HTMLElement | null = null;
+  for (const div of candidates) {
+    if (playfield && (div === playfield || playfield.contains(div) || div.contains(playfield))) {
+      continue;
+    }
+    let count = 0;
+    const labels = div.querySelectorAll<HTMLElement>("p, span");
+    for (const p of Array.from(labels)) {
+      const text = (p.textContent || "").trim();
+      if (text.length > 0 && text.length < 14 && SCORE_LABEL_RE.test(text)) {
+        count++;
+      }
+    }
+    if (count >= 2 && !multiHit) multiHit = div;
+    if (count >= 1 && !singleHit) singleHit = div;
+  }
+  return multiHit ?? singleHit;
+}
+
+type Snapshot = { el: HTMLElement; cssText: string };
+type ScoreMove = {
+  panel: HTMLElement;
+  parent: ParentNode;
+  next: ChildNode | null;
+  panelSnap: Snapshot;
+  childSnaps: Snapshot[];
+};
+
+function snapshot(el: HTMLElement): Snapshot {
+  return { el, cssText: el.style.cssText };
+}
+function restore(s: Snapshot) {
+  s.el.style.cssText = s.cssText;
+}
+
 export default function MobileFullscreen({ orientation, children }: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
+  const hiddenRef = useRef<HTMLElement[]>([]);
+  const playfieldSnapRef = useRef<Snapshot | null>(null);
+  const scoreMoveRef = useRef<ScoreMove | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [needsRotate, setNeedsRotate] = useState(false);
   const [scale, setScale] = useState(1);
 
   useEffect(() => {
-    const coarse = window.matchMedia("(pointer: coarse)").matches;
-    const small = window.matchMedia("(max-width: 900px)").matches;
-    setIsMobile(coarse && small);
+    const mq = window.matchMedia("(pointer: coarse)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
   }, []);
 
   useEffect(() => {
@@ -50,26 +155,122 @@ export default function MobileFullscreen({ orientation, children }: Props) {
     if (!isFullscreen) {
       setNeedsRotate(false);
       setScale(1);
+      hiddenRef.current.forEach((el) => {
+        el.style.display = "";
+      });
+      hiddenRef.current = [];
+
+      const move = scoreMoveRef.current;
+      if (move) {
+        move.childSnaps.forEach(restore);
+        restore(move.panelSnap);
+        move.parent.insertBefore(move.panel, move.next);
+        scoreMoveRef.current = null;
+      }
+      if (playfieldSnapRef.current) {
+        restore(playfieldSnapRef.current);
+        playfieldSnapRef.current = null;
+      }
       return;
     }
+
+    const inner = innerRef.current;
+    if (!inner) return;
+
+    const targets = collectNonEssential(inner);
+    targets.forEach((el) => {
+      el.style.display = "none";
+    });
+    hiddenRef.current = targets;
+
+    const playfield = findPlayfield(inner);
+    const panel = playfield ? findScorePanel(inner, playfield) : null;
+
+    if (playfield && panel) {
+      playfieldSnapRef.current = snapshot(playfield);
+      playfield.style.position = "relative";
+
+      const childSnaps: Snapshot[] = [];
+      Array.from(panel.children).forEach((c) => {
+        const el = c as HTMLElement;
+        childSnaps.push(snapshot(el));
+        el.style.background = "transparent";
+        el.style.padding = "0";
+        el.style.border = "none";
+        el.style.minWidth = "0";
+        el.style.display = "flex";
+        el.style.alignItems = "baseline";
+        el.style.gap = "4px";
+      });
+      panel.querySelectorAll<HTMLElement>("p, span").forEach((textEl) => {
+        const text = (textEl.textContent || "").trim();
+        if (text.length === 0 || text.length > 14) return;
+        childSnaps.push(snapshot(textEl));
+        textEl.style.marginTop = "0";
+        textEl.style.lineHeight = "1";
+        if (SCORE_LABEL_RE.test(text)) {
+          textEl.style.fontSize = "7px";
+          textEl.style.letterSpacing = "0.1em";
+          textEl.style.opacity = "0.7";
+        } else {
+          textEl.style.fontSize = "10px";
+          textEl.style.fontWeight = "600";
+        }
+      });
+
+      const panelSnap = snapshot(panel);
+      const move: ScoreMove = {
+        panel,
+        parent: panel.parentNode!,
+        next: panel.nextSibling,
+        panelSnap,
+        childSnaps,
+      };
+      scoreMoveRef.current = move;
+
+      panel.style.position = "absolute";
+      panel.style.top = "4px";
+      panel.style.right = "4px";
+      panel.style.left = "auto";
+      panel.style.transform = "none";
+      panel.style.zIndex = "30";
+      panel.style.display = "flex";
+      panel.style.flexDirection = "column";
+      panel.style.alignItems = "flex-end";
+      panel.style.gap = "1px";
+      panel.style.background = "rgba(0,0,0,0.45)";
+      panel.style.backdropFilter = "blur(6px)";
+      panel.style.border = "1px solid rgba(255,255,255,0.1)";
+      panel.style.borderRadius = "4px";
+      panel.style.padding = "2px 5px";
+      panel.style.color = "#fff";
+      panel.style.gridTemplateColumns = "none";
+      panel.style.gridTemplateRows = "none";
+      panel.style.width = "auto";
+      panel.style.maxWidth = "40%";
+      panel.style.pointerEvents = "none";
+
+      playfield.appendChild(panel);
+    }
+
     const compute = () => {
       const stage = stageRef.current;
-      const inner = innerRef.current;
-      if (!stage || !inner) return;
+      const innerEl = innerRef.current;
+      if (!stage || !innerEl) return;
       const sw = stage.clientWidth;
       const sh = stage.clientHeight;
       const wide = sw > sh;
       const wantsLandscape = orientation === "landscape";
       setNeedsRotate(isMobile && wantsLandscape !== wide);
 
-      const prev = inner.style.transform;
-      inner.style.transform = "none";
-      const rect = inner.getBoundingClientRect();
-      inner.style.transform = prev;
+      const prev = innerEl.style.transform;
+      innerEl.style.transform = "none";
+      const rect = innerEl.getBoundingClientRect();
+      innerEl.style.transform = prev;
       const naturalW = rect.width;
       const naturalH = rect.height;
       if (naturalW > 0 && naturalH > 0) {
-        const pad = 0.94;
+        const pad = 0.96;
         const s = Math.min((sw / naturalW) * pad, (sh / naturalH) * pad);
         setScale(s > 0 ? s : 1);
       }
@@ -114,7 +315,7 @@ export default function MobileFullscreen({ orientation, children }: Props) {
   return (
     <>
       {isMobile && !isFullscreen && (
-        <div className="mb-6 flex sm:hidden">
+        <div className="mb-6 flex">
           <button
             type="button"
             onClick={enter}
@@ -132,7 +333,7 @@ export default function MobileFullscreen({ orientation, children }: Props) {
         ref={stageRef}
         className={
           isFullscreen
-            ? "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-background"
+            ? "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black"
             : ""
         }
       >
@@ -140,16 +341,16 @@ export default function MobileFullscreen({ orientation, children }: Props) {
           <button
             type="button"
             onClick={exit}
-            className="absolute right-3 top-3 z-20 rounded-md border border-line bg-surface/90 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-muted backdrop-blur transition-colors hover:text-foreground"
+            className="absolute right-3 top-3 z-40 rounded-md border border-white/15 bg-black/60 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-white/70 backdrop-blur transition-colors hover:text-white"
           >
             Exit ✕
           </button>
         )}
         {isFullscreen && needsRotate && (
-          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-background/85 p-6 text-center">
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-black/85 p-6 text-center">
             <div className="max-w-xs">
-              <p className="font-serif text-2xl">Rotate your device</p>
-              <p className="mt-2 text-sm text-muted">
+              <p className="font-serif text-2xl text-white">Rotate your device</p>
+              <p className="mt-2 text-sm text-white/60">
                 This game plays best in {orientation}.
               </p>
             </div>
