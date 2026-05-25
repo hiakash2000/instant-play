@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import MobileFullscreen from "../MobileFullscreen";
 import FlappyDunkGame from "./FlappyDunkGame";
 
 export const metadata: Metadata = {
-  title: "Flappy Dunk · InstantPlay",
+  title: "Flappy Dunk · GetInstantPlay",
 };
 
 export default function Page() {
@@ -19,7 +20,9 @@ export default function Page() {
         enough to dunk it.
       </p>
       <div className="mt-12">
-        <FlappyDunkGame />
+        <MobileFullscreen orientation="portrait">
+          <FlappyDunkGame />
+        </MobileFullscreen>
       </div>
     </div>
   );

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import MobileFullscreen from "../MobileFullscreen";
 import DuckHuntGame from "./DuckHuntGame";
 
 export const metadata: Metadata = {
-  title: "Duck Hunt · InstantPlay",
+  title: "Duck Hunt · GetInstantPlay",
 };
 
 export default function Page() {
@@ -19,7 +20,9 @@ export default function Page() {
         will hide in the bush and pop up where you aren&apos;t looking.
       </p>
       <div className="mt-12">
-        <DuckHuntGame />
+        <MobileFullscreen orientation="landscape">
+          <DuckHuntGame />
+        </MobileFullscreen>
       </div>
     </div>
   );

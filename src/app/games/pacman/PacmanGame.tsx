@@ -311,19 +311,20 @@ export default function PacmanGame() {
           onPointerDown={onBoardPointerDown}
           onPointerUp={onBoardPointerUp}
           onPointerCancel={() => (touchStartRef.current = null)}
-          className="relative overflow-hidden border border-line bg-surface select-none touch-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
+          className="relative overflow-hidden border border-line select-none touch-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none", background: "#020617" }}
           aria-label="Pacman"
         >
           {wallCells.map((w) => (
             <span
               key={`w-${w.x}-${w.y}`}
-              className="absolute bg-line"
+              className="absolute"
               style={{
                 left: w.x * CELL + 2,
                 top: w.y * CELL + 2,
                 width: CELL - 4,
                 height: CELL - 4,
+                background: "#3b82f6",
               }}
             />
           ))}
@@ -332,47 +333,45 @@ export default function PacmanGame() {
               isDot ? (
                 <span
                   key={`d-${x}-${y}`}
-                  className="absolute rounded-full bg-muted"
+                  className="absolute rounded-full"
                   style={{
                     left: x * CELL + CELL / 2 - 2,
                     top: y * CELL + CELL / 2 - 2,
                     width: 4,
                     height: 4,
+                    background: "#fef3c7",
                   }}
                 />
               ) : null,
             ),
           )}
           <span
-            className="absolute rounded-full bg-accent"
+            className="absolute rounded-full"
             style={{
               left: pac.current.x * CELL + 3,
               top: pac.current.y * CELL + 3,
               width: CELL - 6,
               height: CELL - 6,
+              background: "#facc15",
             }}
             aria-hidden
           />
-          {ghosts.current.map((g, i) => (
-            <span
-              key={`g-${i}`}
-              className={
-                i === 0
-                  ? "absolute rounded-t-full bg-rose-500/80"
-                  : i === 1
-                    ? "absolute rounded-t-full bg-sky-400/80"
-                    : i === 2
-                      ? "absolute rounded-t-full bg-orange-400/80"
-                      : "absolute rounded-t-full bg-fuchsia-400/80"
-              }
-              style={{
-                left: g.x * CELL + 3,
-                top: g.y * CELL + 3,
-                width: CELL - 6,
-                height: CELL - 6,
-              }}
-            />
-          ))}
+          {ghosts.current.map((g, i) => {
+            const GHOST_COLORS = ["#ef4444", "#22d3ee", "#f472b6", "#fb923c"];
+            return (
+              <span
+                key={`g-${i}`}
+                className="absolute rounded-t-full"
+                style={{
+                  left: g.x * CELL + 3,
+                  top: g.y * CELL + 3,
+                  width: CELL - 6,
+                  height: CELL - 6,
+                  background: GHOST_COLORS[i % GHOST_COLORS.length],
+                }}
+              />
+            );
+          })}
           {phase !== "playing" && (
             <span className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 text-center">
               <span className="font-serif text-3xl tracking-tight">

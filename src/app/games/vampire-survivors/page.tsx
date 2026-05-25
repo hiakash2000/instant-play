@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import MobileFullscreen from "../MobileFullscreen";
 import VampireSurvivorsGame from "./VampireSurvivorsGame";
 
 export const metadata: Metadata = {
-  title: "Vampire Survivors · InstantPlay",
+  title: "Vampire Survivors · GetInstantPlay",
 };
 
 export default function Page() {
@@ -19,7 +20,9 @@ export default function Page() {
         upgrades, survive.
       </p>
       <div className="mt-12">
-        <VampireSurvivorsGame />
+        <MobileFullscreen orientation="landscape">
+          <VampireSurvivorsGame />
+        </MobileFullscreen>
       </div>
     </div>
   );

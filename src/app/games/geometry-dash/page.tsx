@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import MobileFullscreen from "../MobileFullscreen";
 import GeometryDashGame from "./GeometryDashGame";
 
 export const metadata: Metadata = {
-  title: "Geometry Dash · InstantPlay",
+  title: "Geometry Dash · GetInstantPlay",
 };
 
 export default function Page() {
@@ -18,7 +19,9 @@ export default function Page() {
         The square never stops running. Time your jumps to clear the spikes.
       </p>
       <div className="mt-12">
-        <GeometryDashGame />
+        <MobileFullscreen orientation="landscape">
+          <GeometryDashGame />
+        </MobileFullscreen>
       </div>
     </div>
   );

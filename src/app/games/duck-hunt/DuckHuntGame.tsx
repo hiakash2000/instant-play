@@ -167,41 +167,44 @@ export default function DuckHuntGame() {
         <button
           type="button"
           onPointerDown={onBoardClick}
-          className="relative overflow-hidden border border-line bg-surface touch-manipulation select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", cursor: "crosshair", touchAction: "manipulation" }}
+          className="relative overflow-hidden border border-line touch-manipulation select-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", cursor: "crosshair", touchAction: "manipulation", background: "linear-gradient(to bottom, #93c5fd, #bfdbfe)" }}
           aria-label="Shoot"
         >
           {/* Bush along the bottom */}
           <span
-            className="absolute bg-foreground/10"
+            className="absolute"
             style={{
               left: 0,
               right: 0,
               bottom: 0,
               height: BUSH_H,
+              background: "#15803d",
             }}
           />
           <span
-            className="absolute bg-foreground/20"
+            className="absolute"
             style={{
               left: 0,
               right: 0,
               bottom: BUSH_H - 1,
               height: 2,
+              background: "#14532d",
             }}
           />
 
           {showDuck && d && (
             <span
-              className={`absolute ${
-                d.state === "dead" ? "bg-foreground/60" : "bg-accent"
-              }`}
+              className="absolute"
               style={{
                 left: d.x,
                 top: d.y,
                 width: DUCK_W,
                 height: DUCK_H,
                 transform: d.state === "dead" ? "rotate(20deg)" : undefined,
+                background: "#7c2d12",
+                borderTop: `4px solid #f97316`,
+                opacity: d.state === "dead" ? 0.6 : 1,
               }}
             />
           )}

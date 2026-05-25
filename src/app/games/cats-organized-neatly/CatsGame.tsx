@@ -18,6 +18,7 @@ const SHAPES: Cell[][] = [
 
 const CELL = 56;
 const TRAY_CELL = 26;
+const CAT_COLORS = ["#f472b6", "#facc15", "#22d3ee", "#a78bfa", "#fb7185", "#4ade80", "#fb923c", "#60a5fa"];
 
 function makeLevel(level: number) {
   const size = Math.min(3 + level, 6);
@@ -231,12 +232,14 @@ export default function CatsGame() {
                 {piece.cells.map((c, i) => (
                   <span
                     key={i}
-                    className="absolute bg-accent/80"
+                    className="absolute"
                     style={{
                       left: c.dx * CELL + 2,
                       top: c.dy * CELL + 2,
                       width: CELL - 4,
                       height: CELL - 4,
+                      background: CAT_COLORS[id % CAT_COLORS.length],
+                      opacity: 0.85,
                     }}
                   />
                 ))}
@@ -256,12 +259,14 @@ export default function CatsGame() {
                 return (
                   <span
                     key={i}
-                    className={`absolute ${conflict ? "bg-rose-500/40" : "bg-accent/30"}`}
+                    className="absolute"
                     style={{
                       left: x * CELL + 2,
                       top: y * CELL + 2,
                       width: CELL - 4,
                       height: CELL - 4,
+                      background: conflict ? "rgba(244,63,94,0.4)" : CAT_COLORS[drag!.id % CAT_COLORS.length],
+                      opacity: conflict ? 1 : 0.35,
                     }}
                   />
                 );
@@ -310,12 +315,14 @@ export default function CatsGame() {
                 {piece.cells.map((c, i) => (
                   <span
                     key={i}
-                    className="absolute bg-accent/70"
+                    className="absolute"
                     style={{
                       left: (c.dx - b.minX) * TRAY_CELL,
                       top: (c.dy - b.minY) * TRAY_CELL,
                       width: TRAY_CELL - 2,
                       height: TRAY_CELL - 2,
+                      background: CAT_COLORS[piece.id % CAT_COLORS.length],
+                      opacity: 0.75,
                     }}
                   />
                 ))}
@@ -339,12 +346,13 @@ export default function CatsGame() {
             {draggingPiece.cells.map((c, i) => (
               <span
                 key={i}
-                className="absolute bg-accent"
+                className="absolute"
                 style={{
                   left: c.dx * CELL + 2,
                   top: c.dy * CELL + 2,
                   width: CELL - 4,
                   height: CELL - 4,
+                  background: CAT_COLORS[draggingPiece.id % CAT_COLORS.length],
                 }}
               />
             ))}

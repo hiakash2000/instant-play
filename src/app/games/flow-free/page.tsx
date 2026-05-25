@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import MobileFullscreen from "../MobileFullscreen";
 import FlowFreeGame from "./FlowFreeGame";
 
 export const metadata: Metadata = {
-  title: "Flow Free · InstantPlay",
+  title: "Flow Free · GetInstantPlay",
 };
 
 export default function Page() {
@@ -18,7 +19,9 @@ export default function Page() {
         Connect every pair of dots through the grid. No crossings, no gaps.
       </p>
       <div className="mt-12">
-        <FlowFreeGame />
+        <MobileFullscreen orientation="portrait">
+          <FlowFreeGame />
+        </MobileFullscreen>
       </div>
     </div>
   );

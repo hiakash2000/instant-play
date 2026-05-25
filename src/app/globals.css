@@ -46,6 +46,15 @@
   --surface-active: #d4c8a8;
 }
 
+:root {
+  --hue-rose: #ff5d8f;
+  --hue-amber: #f5a524;
+  --hue-teal: #2dd4bf;
+  --hue-violet: #a78bfa;
+  --hue-sky: #38bdf8;
+  --hue-lime: #a3e635;
+}
+
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -55,6 +64,12 @@
   --color-surface: var(--surface);
   --color-surface-hover: var(--surface-hover);
   --color-surface-active: var(--surface-active);
+  --color-hue-rose: var(--hue-rose);
+  --color-hue-amber: var(--hue-amber);
+  --color-hue-teal: var(--hue-teal);
+  --color-hue-violet: var(--hue-violet);
+  --color-hue-sky: var(--hue-sky);
+  --color-hue-lime: var(--hue-lime);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-instrument-serif);

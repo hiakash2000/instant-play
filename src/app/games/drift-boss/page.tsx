@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import MobileFullscreen from "../MobileFullscreen";
 import DriftBossGame from "./DriftBossGame";
 
 export const metadata: Metadata = {
-  title: "Drift Boss · InstantPlay",
+  title: "Drift Boss · GetInstantPlay",
 };
 
 export default function Page() {
@@ -18,7 +19,9 @@ export default function Page() {
         Tap to flip the wheel. The road keeps building itself — stay on it.
       </p>
       <div className="mt-12">
-        <DriftBossGame />
+        <MobileFullscreen orientation="portrait">
+          <DriftBossGame />
+        </MobileFullscreen>
       </div>
     </div>
   );

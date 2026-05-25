@@ -140,7 +140,7 @@ export default function FruitStabGame() {
           aria-label="Throw"
         >
           <span
-            className="absolute rounded-full bg-accent"
+            className="absolute rounded-full"
             style={{
               left: CENTER_X - FRUIT_R,
               top: CENTER_Y - FRUIT_R,
@@ -148,6 +148,20 @@ export default function FruitStabGame() {
               height: FRUIT_R * 2,
               transform: `rotate(${rotationRef.current}rad)`,
               transformOrigin: "center",
+              background: "#ef4444",
+              border: "3px solid #b91c1c",
+            }}
+          />
+          <span
+            className="absolute"
+            style={{
+              left: CENTER_X - 4,
+              top: CENTER_Y - FRUIT_R - 14,
+              width: 8,
+              height: 16,
+              background: "#15803d",
+              transform: `rotate(${rotationRef.current}rad)`,
+              transformOrigin: `4px ${FRUIT_R + 14}px`,
             }}
           />
           {stuckRef.current.map((a, i) => {
@@ -157,26 +171,30 @@ export default function FruitStabGame() {
             return (
               <span
                 key={i}
-                className="absolute bg-foreground"
+                className="absolute"
                 style={{
                   left: x - 1,
                   top: y,
-                  width: 2,
+                  width: 3,
                   height: KNIFE_LEN,
                   transformOrigin: "top center",
                   transform: `rotate(${(ang * 180) / Math.PI}deg) translateY(0)`,
+                  background: "#e5e7eb",
+                  borderLeft: "1px solid #9ca3af",
                 }}
               />
             );
           })}
           {flyingRef.current && (
             <span
-              className="absolute bg-foreground"
+              className="absolute"
               style={{
                 left: CENTER_X - 1,
                 top: flyingRef.current.y - KNIFE_LEN,
-                width: 2,
+                width: 3,
                 height: KNIFE_LEN,
+                background: "#e5e7eb",
+                borderLeft: "1px solid #9ca3af",
               }}
             />
           )}

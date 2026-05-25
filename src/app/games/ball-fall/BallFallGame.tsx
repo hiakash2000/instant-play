@@ -190,27 +190,31 @@ export default function BallFallGame() {
               Math.min(WIDTH, holeScreenX + HOLE_WIDTH / 2),
             );
             const rightWidth = Math.max(0, WIDTH - rightStart);
+            const PLANK_COLORS = ["#22d3ee", "#a78bfa", "#f472b6", "#facc15", "#4ade80"];
+            const plankColor = PLANK_COLORS[i % PLANK_COLORS.length];
             return (
               <span key={i}>
                 {leftWidth > 0 && (
                   <span
-                    className="absolute bg-accent/70"
+                    className="absolute"
                     style={{
                       left: 0,
                       top: p.y,
                       width: leftWidth,
                       height: PLANK_HEIGHT,
+                      background: plankColor,
                     }}
                   />
                 )}
                 {rightWidth > 0 && (
                   <span
-                    className="absolute bg-accent/70"
+                    className="absolute"
                     style={{
                       left: rightStart,
                       top: p.y,
                       width: rightWidth,
                       height: PLANK_HEIGHT,
+                      background: plankColor,
                     }}
                   />
                 )}
@@ -218,12 +222,13 @@ export default function BallFallGame() {
             );
           })}
           <span
-            className="absolute rounded-full bg-foreground"
+            className="absolute rounded-full"
             style={{
               left: BALL_X - BALL_R,
               top: BALL_Y - BALL_R,
               width: BALL_R * 2,
               height: BALL_R * 2,
+              background: "#f97316",
             }}
             aria-hidden
           />

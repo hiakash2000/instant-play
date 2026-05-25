@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import MobileFullscreen from "../MobileFullscreen";
 import BallFallGame from "./BallFallGame";
 
 export const metadata: Metadata = {
-  title: "Ball Fall · InstantPlay",
+  title: "Ball Fall · GetInstantPlay",
 };
 
 export default function Page() {
@@ -19,7 +20,9 @@ export default function Page() {
         stack left or right so the gap is under the ball before it lands.
       </p>
       <div className="mt-12">
-        <BallFallGame />
+        <MobileFullscreen orientation="portrait">
+          <BallFallGame />
+        </MobileFullscreen>
       </div>
     </div>
   );

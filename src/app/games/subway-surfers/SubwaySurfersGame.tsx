@@ -167,36 +167,42 @@ export default function SubwaySurfersGame() {
           onPointerDown={onBoardPointerDown}
           onPointerUp={onBoardPointerUp}
           onPointerCancel={() => (touchStartRef.current = null)}
-          className="relative overflow-hidden border border-line bg-surface touch-none select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
+          className="relative overflow-hidden border border-line touch-none select-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none", background: "linear-gradient(to bottom, #1f2937, #374151)" }}
         >
           {[1, 2].map((i) => (
             <span
               key={i}
-              className="absolute top-0 bottom-0 w-px bg-line"
-              style={{ left: LANE_W * i }}
+              className="absolute top-0 bottom-0"
+              style={{ left: LANE_W * i, width: 2, background: "#facc15" }}
             />
           ))}
-          {obstaclesRef.current.map((o, i) => (
-            <span
-              key={i}
-              className={o.kind === "train" ? "absolute bg-foreground/70" : "absolute bg-accent/70"}
-              style={{
-                left: o.lane * LANE_W + LANE_W / 2 - 22,
-                top: o.y,
-                width: 44,
-                height: o.kind === "train" ? 90 : 18,
-              }}
-            />
-          ))}
+          {obstaclesRef.current.map((o, i) => {
+            const TRAIN_COLORS = ["#f97316", "#22d3ee", "#a78bfa"];
+            const trainColor = TRAIN_COLORS[i % TRAIN_COLORS.length];
+            return (
+              <span
+                key={i}
+                className="absolute"
+                style={{
+                  left: o.lane * LANE_W + LANE_W / 2 - 22,
+                  top: o.y,
+                  width: 44,
+                  height: o.kind === "train" ? 90 : 18,
+                  background: o.kind === "train" ? trainColor : "#facc15",
+                }}
+              />
+            );
+          })}
           <span
-            className="absolute bg-accent transition-[left,transform] duration-100"
+            className="absolute transition-[left,transform] duration-100"
             style={{
               left: laneRef.current * LANE_W + LANE_W / 2 - PLAYER_W / 2,
               top: PLAYER_Y,
               width: PLAYER_W,
               height: PLAYER_H,
               transform: jumpRef.current > 0 ? `translateY(-30px) scale(0.85)` : "none",
+              background: "#ec4899",
             }}
           />
           {phase !== "playing" && (

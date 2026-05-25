@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import MobileFullscreen from "../MobileFullscreen";
 import PacmanGame from "./PacmanGame";
 
 export const metadata: Metadata = {
-  title: "Pacman · InstantPlay",
+  title: "Pacman · GetInstantPlay",
 };
 
 export default function Page() {
@@ -19,7 +20,9 @@ export default function Page() {
         the next level with one more ghost.
       </p>
       <div className="mt-12">
-        <PacmanGame />
+        <MobileFullscreen orientation="landscape">
+          <PacmanGame />
+        </MobileFullscreen>
       </div>
     </div>
   );

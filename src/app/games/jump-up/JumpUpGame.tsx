@@ -250,26 +250,30 @@ export default function JumpUpGame() {
             const screenY = p.y - viewY;
             if (screenY < -PLANK_H || screenY > HEIGHT + PLANK_H) return null;
             const px = plankX(p);
+            const PLANK_COLORS = ["#f472b6", "#22d3ee", "#a78bfa", "#4ade80"];
+            const plankColor = PLANK_COLORS[i % PLANK_COLORS.length];
             return (
               <span
                 key={i}
-                className="absolute bg-accent/70"
+                className="absolute"
                 style={{
                   left: px - PLANK_W / 2,
                   top: screenY,
                   width: PLANK_W,
                   height: PLANK_H,
+                  background: plankColor,
                 }}
               />
             );
           })}
           <span
-            className="absolute bg-foreground"
+            className="absolute"
             style={{
               left: charX.current,
               top: charScreenY,
               width: CHAR_W,
               height: CHAR_H,
+              background: "#facc15",
             }}
             aria-hidden
           />

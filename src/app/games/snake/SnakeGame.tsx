@@ -249,18 +249,18 @@ export default function SnakeGame() {
               const isHead = key === headKey;
               const isBody = bodyKeys.has(key);
               const isFood = key === foodKey;
+              const bg = isHead
+                ? "#22c55e"
+                : isBody
+                  ? "rgba(34,197,94,0.6)"
+                  : isFood
+                    ? "#ef4444"
+                    : undefined;
               return (
                 <div
                   key={i}
-                  className={`border-[0.5px] border-line/30 ${
-                    isHead
-                      ? "bg-accent"
-                      : isBody
-                        ? "bg-accent/70"
-                        : isFood
-                          ? "bg-foreground/80"
-                          : ""
-                  }`}
+                  className="border-[0.5px] border-line/30"
+                  style={{ background: bg }}
                 />
               );
             })}

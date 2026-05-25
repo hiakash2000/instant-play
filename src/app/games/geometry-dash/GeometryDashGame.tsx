@@ -134,33 +134,35 @@ export default function GeometryDashGame() {
             e.preventDefault();
             jump();
           }}
-          className="relative overflow-hidden border border-line bg-surface touch-manipulation select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation" }}
+          className="relative overflow-hidden border border-line touch-manipulation select-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation", background: "linear-gradient(to bottom, #1e1b4b, #312e81)" }}
           aria-label="Jump"
         >
           <span
-            className="absolute left-0 right-0 bg-line"
-            style={{ top: GROUND_Y, height: 1 }}
+            className="absolute left-0 right-0"
+            style={{ top: GROUND_Y, height: 2, background: "#a78bfa" }}
           />
           <span
-            className="absolute bg-accent"
+            className="absolute"
             style={{
               left: PLAYER_X,
               top: yRef.current,
               width: PLAYER_SIZE,
               height: PLAYER_SIZE,
+              background: "#22d3ee",
             }}
           />
           {spikesRef.current.map((s, i) => (
             <span
               key={i}
-              className="absolute bg-foreground/70"
+              className="absolute"
               style={{
                 left: s.x,
                 top: GROUND_Y - 22,
                 width: 24,
                 height: 22,
                 clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
+                background: "#f472b6",
               }}
             />
           ))}

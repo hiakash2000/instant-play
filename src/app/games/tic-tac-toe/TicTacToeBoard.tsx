@@ -115,6 +115,7 @@ export default function TicTacToeBoard() {
         {cells.map((c, i) => {
           const inWinLine = line?.includes(i);
           const disabled = Boolean(c) || Boolean(winner) || turn !== "X";
+          const markColor = c === "X" ? "#ff5d8f" : c === "O" ? "#38bdf8" : undefined;
           return (
             <button
               key={i}
@@ -122,9 +123,15 @@ export default function TicTacToeBoard() {
               onClick={() => play(i)}
               disabled={disabled}
               aria-label={`Cell ${i + 1}${c ? `, ${c}` : ", empty"}`}
-              className={`flex h-24 w-24 items-center justify-center border border-line font-serif text-5xl transition-colors sm:h-28 sm:w-28 ${
-                c ? "text-foreground" : "text-muted hover:bg-surface-hover"
-              } ${inWinLine ? "border-accent text-accent" : ""} disabled:cursor-default`}
+              className={`flex h-24 w-24 items-center justify-center border ${
+                inWinLine ? "" : "border-line"
+              } font-serif text-5xl transition-colors sm:h-28 sm:w-28 ${
+                c ? "" : "text-muted hover:bg-surface-hover"
+              } disabled:cursor-default`}
+              style={{
+                color: inWinLine ? "#facc15" : markColor,
+                borderColor: inWinLine ? "#facc15" : undefined,
+              }}
             >
               {c ?? ""}
             </button>

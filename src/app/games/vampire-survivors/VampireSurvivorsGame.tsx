@@ -290,45 +290,50 @@ export default function VampireSurvivorsGame() {
           onPointerUp={endTouch}
           onPointerCancel={endTouch}
           onPointerLeave={endTouch}
-          className="relative overflow-hidden border border-line bg-surface select-none touch-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
+          className="relative overflow-hidden border border-line select-none touch-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none", background: "#1e1b4b" }}
         >
-          {enemiesRef.current.map((e, i) => (
-            <span
-              key={`e${i}`}
-              className="absolute bg-rose-500/80"
-              style={{ left: e.x - 7, top: e.y - 7, width: 14, height: 14 }}
-            />
-          ))}
+          {enemiesRef.current.map((e, i) => {
+            const ENEMY_COLORS = ["#ef4444", "#a855f7", "#f472b6"];
+            return (
+              <span
+                key={`e${i}`}
+                className="absolute"
+                style={{ left: e.x - 7, top: e.y - 7, width: 14, height: 14, background: ENEMY_COLORS[i % ENEMY_COLORS.length] }}
+              />
+            );
+          })}
           {gemsRef.current.map((g, i) => (
             <span
               key={`g${i}`}
-              className="absolute bg-accent"
-              style={{ left: g.x - 3, top: g.y - 3, width: 6, height: 6 }}
+              className="absolute"
+              style={{ left: g.x - 3, top: g.y - 3, width: 6, height: 6, background: "#22d3ee" }}
             />
           ))}
           {bulletsRef.current.map((b, i) => (
             <span
               key={`b${i}`}
-              className="absolute rounded-full bg-foreground"
-              style={{ left: b.x - 2, top: b.y - 2, width: 4, height: 4 }}
+              className="absolute rounded-full"
+              style={{ left: b.x - 2, top: b.y - 2, width: 4, height: 4, background: "#fde047" }}
             />
           ))}
           <span
-            className="absolute bg-accent"
+            className="absolute"
             style={{
               left: playerRef.current.x - 9,
               top: playerRef.current.y - 9,
               width: 18,
               height: 18,
+              background: "#facc15",
+              boxShadow: "0 0 12px rgba(250,204,21,0.7)",
             }}
           />
 
           {/* HP bar */}
           <span className="absolute left-3 top-3 h-2 w-40 bg-line">
             <span
-              className="block h-full bg-rose-500"
-              style={{ width: `${Math.max(0, (hp / maxHp) * 100)}%` }}
+              className="block h-full"
+              style={{ width: `${Math.max(0, (hp / maxHp) * 100)}%`, background: "#ef4444" }}
             />
           </span>
 

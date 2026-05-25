@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import MobileFullscreen from "../MobileFullscreen";
 import TennisGame from "./TennisGame";
 
 export const metadata: Metadata = {
-  title: "Tennis · InstantPlay",
+  title: "Tennis · GetInstantPlay",
 };
 
 export default function Page() {
@@ -19,7 +20,9 @@ export default function Page() {
         ball speeds up every rally.
       </p>
       <div className="mt-12">
-        <TennisGame />
+        <MobileFullscreen orientation="landscape">
+          <TennisGame />
+        </MobileFullscreen>
       </div>
     </div>
   );

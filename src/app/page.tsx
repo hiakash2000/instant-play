@@ -14,6 +14,7 @@ type Game = {
 type Category = {
   name: string;
   blurb: string;
+  hue: string;
   games: Game[];
 };
 
@@ -21,6 +22,7 @@ const categories: Category[] = [
   {
     name: "Classic",
     blurb: "Six small arcades. The ones you already know how to play.",
+    hue: "#f5a524",
     games: [
       {
         slug: "tic-tac-toe",
@@ -69,6 +71,7 @@ const categories: Category[] = [
   {
     name: "Action & Arcade",
     blurb: "One-tap and swipe games. Reflex over thought.",
+    hue: "#ff5d8f",
     games: [
       {
         slug: "geometry-dash",
@@ -138,6 +141,7 @@ const categories: Category[] = [
   {
     name: "Puzzle & Strategy",
     blurb: "Slower games. Cards, pipes, and quiet boards.",
+    hue: "#38bdf8",
     games: [
       {
         slug: "cats-organized-neatly",
@@ -165,6 +169,7 @@ const categories: Category[] = [
   {
     name: "Idle & Simulation",
     blurb: "Games that play themselves while you steer the upgrades.",
+    hue: "#a78bfa",
     games: [
       {
         slug: "vampire-survivors",
@@ -217,15 +222,38 @@ export default function Home() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <section className="border-b border-line">
-        <div className="mx-auto max-w-6xl px-6 py-24 sm:px-10 sm:py-32">
+      <section className="relative overflow-hidden border-b border-line">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full opacity-40 blur-3xl"
+          style={{ background: "radial-gradient(circle, #ff5d8f, transparent 70%)" }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-24 top-12 h-80 w-80 rounded-full opacity-35 blur-3xl"
+          style={{ background: "radial-gradient(circle, #38bdf8, transparent 70%)" }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/3 -bottom-32 h-96 w-96 rounded-full opacity-30 blur-3xl"
+          style={{ background: "radial-gradient(circle, #a78bfa, transparent 70%)" }}
+        />
+        <div className="relative mx-auto max-w-6xl px-6 py-24 sm:px-10 sm:py-32">
           <p className="mb-8 font-mono text-xs uppercase tracking-[0.2em] text-muted">
             A small collection
           </p>
           <h1 className="max-w-3xl font-serif text-5xl leading-[1.05] tracking-tight sm:text-7xl">
             Games you can{" "}
-            <span className="italic text-accent">start playing</span> in a
-            single click.
+            <span
+              className="bg-clip-text italic text-transparent"
+              style={{
+                backgroundImage:
+                  "linear-gradient(90deg, #ff5d8f, #f5a524, #2dd4bf, #a78bfa)",
+              }}
+            >
+              start playing
+            </span>{" "}
+            in a single click.
           </h1>
           <p className="mt-8 max-w-xl text-lg leading-relaxed text-muted">
             No accounts, no downloads, no waiting rooms. Pick a board and
@@ -246,8 +274,13 @@ export default function Home() {
             <li key={category.name}>
               <a
                 href={`#${slugify(category.name)}`}
-                className="inline-block whitespace-nowrap border border-transparent px-4 py-2 font-mono text-xs uppercase tracking-[0.2em] text-muted transition-colors hover:border-line hover:text-foreground"
+                className="inline-flex items-center gap-2 whitespace-nowrap border border-transparent px-4 py-2 font-mono text-xs uppercase tracking-[0.2em] text-muted transition-colors hover:border-line hover:text-foreground"
               >
+                <span
+                  aria-hidden
+                  className="h-2 w-2 rounded-full"
+                  style={{ backgroundColor: category.hue }}
+                />
                 {category.name}
               </a>
             </li>
@@ -263,8 +296,13 @@ export default function Home() {
         >
           <div className="mb-10 flex items-baseline justify-between gap-6">
             <div>
+              <span
+                aria-hidden
+                className="mb-4 block h-1 w-12 rounded-full"
+                style={{ backgroundColor: category.hue }}
+              />
               <h2 className="font-serif text-3xl tracking-tight">
-                {category.name}
+                <span style={{ color: category.hue }}>{category.name}</span>
               </h2>
               <p className="mt-2 max-w-xl text-sm text-muted">
                 {category.blurb}
@@ -277,7 +315,13 @@ export default function Home() {
 
           <ul className="grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
             {category.games.map((game) => (
-              <li key={game.slug} className="bg-background">
+              <li
+                key={game.slug}
+                className="bg-background"
+                style={
+                  { ["--card-hue" as string]: category.hue } as React.CSSProperties
+                }
+              >
                 <Link
                   href={`/games/${game.slug}`}
                   className="group flex h-full flex-col justify-between gap-10 p-8 transition-colors hover:bg-surface-hover sm:p-10"
@@ -289,13 +333,17 @@ export default function Home() {
                     <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
                       {game.players}
                     </p>
-                    <h3 className="mt-3 font-serif text-3xl tracking-tight">
+                    <h3
+                      className="mt-3 font-serif text-3xl tracking-tight transition-colors group-hover:[color:var(--card-hue)]"
+                    >
                       {game.title}
                     </h3>
                     <p className="mt-3 text-sm leading-relaxed text-muted">
                       {game.tagline}
                     </p>
-                    <span className="mt-6 inline-flex items-center gap-2 text-sm text-foreground transition-colors group-hover:text-accent">
+                    <span
+                      className="mt-6 inline-flex items-center gap-2 text-sm text-foreground transition-colors group-hover:[color:var(--card-hue)]"
+                    >
                       Play
                       <span
                         aria-hidden
@@ -316,13 +364,14 @@ export default function Home() {
 }
 
 function TicTacToePreview() {
-  const cells = ["X", "", "O", "", "X", "", "O", "", "X"];
+  const cells: Array<"X" | "O" | ""> = ["X", "", "O", "", "X", "", "O", "", "X"];
   return (
     <div className="grid grid-cols-3 gap-2">
       {cells.map((c, i) => (
         <div
           key={i}
-          className="flex h-10 w-10 items-center justify-center border border-line font-serif text-xl text-muted"
+          className="flex h-10 w-10 items-center justify-center border border-line font-serif text-xl"
+          style={{ color: c === "X" ? "#ff5d8f" : c === "O" ? "#38bdf8" : undefined }}
         >
           {c}
         </div>
@@ -347,15 +396,16 @@ function SnakePreview() {
         return (
           <div
             key={i}
-            className={`h-4 w-4 border border-line ${
-              isHead
-                ? "bg-accent"
+            className="h-4 w-4 border border-line"
+            style={{
+              backgroundColor: isHead
+                ? "#22c55e"
                 : isBody
-                  ? "bg-accent/60"
+                  ? "rgba(34,197,94,0.6)"
                   : isFood
-                    ? "bg-foreground/70"
-                    : ""
-            }`}
+                    ? "#ef4444"
+                    : undefined,
+            }}
           />
         );
       })}
@@ -365,36 +415,37 @@ function SnakePreview() {
 
 function FlappyPreview() {
   return (
-    <div className="relative h-24 w-32 border border-line">
-      <span className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-foreground" />
-      <span className="absolute left-16 top-0 h-8 w-4 bg-accent/70" />
-      <span className="absolute left-16 bottom-0 h-10 w-4 bg-accent/70" />
-      <span className="absolute right-2 top-0 h-12 w-4 bg-accent/70" />
-      <span className="absolute right-2 bottom-0 h-6 w-4 bg-accent/70" />
+    <div className="relative h-24 w-32 border border-line" style={{ background: "linear-gradient(to bottom, rgba(56,189,248,0.15), transparent)" }}>
+      <span className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full" style={{ background: "#facc15" }} />
+      <span className="absolute left-16 top-0 h-8 w-4" style={{ background: "#22c55e" }} />
+      <span className="absolute left-16 bottom-0 h-10 w-4" style={{ background: "#22c55e" }} />
+      <span className="absolute right-2 top-0 h-12 w-4" style={{ background: "#22c55e" }} />
+      <span className="absolute right-2 bottom-0 h-6 w-4" style={{ background: "#22c55e" }} />
     </div>
   );
 }
 
 function DinoPreview() {
   return (
-    <div className="relative h-24 w-36 border border-line">
-      <span className="absolute left-0 right-0 bottom-4 h-px bg-line" />
-      <span className="absolute left-4 bottom-4 h-5 w-4 bg-accent" />
-      <span className="absolute left-16 bottom-4 h-6 w-3 bg-foreground/70" />
-      <span className="absolute left-24 bottom-4 h-4 w-3 bg-foreground/70" />
+    <div className="relative h-24 w-36 border border-line" style={{ background: "linear-gradient(to bottom, #fde68a, #fcd34d)" }}>
+      <span className="absolute left-0 right-0 bottom-4 h-px" style={{ background: "#92400e" }} />
+      <span className="absolute left-4 bottom-4 h-5 w-4" style={{ background: "#0f766e" }} />
+      <span className="absolute left-16 bottom-4 h-6 w-3" style={{ background: "#15803d" }} />
+      <span className="absolute left-24 bottom-4 h-4 w-3" style={{ background: "#15803d" }} />
     </div>
   );
 }
 
 function DuckHuntPreview() {
   return (
-    <div className="relative h-24 w-36 border border-line">
-      <span className="absolute left-0 right-0 bottom-0 h-6 bg-foreground/10" />
-      <span className="absolute right-3 top-3 h-3 w-5 bg-accent" />
-      <span className="absolute left-6 top-1/2 h-3 w-5 bg-accent/50" />
+    <div className="relative h-24 w-36 border border-line" style={{ background: "linear-gradient(to bottom, #93c5fd, #bfdbfe)" }}>
+      <span className="absolute left-0 right-0 bottom-0 h-6" style={{ background: "#15803d" }} />
+      <span className="absolute right-3 top-3 h-3 w-5" style={{ background: "#7c2d12" }} />
+      <span className="absolute left-6 top-1/2 h-3 w-5" style={{ background: "rgba(124,45,18,0.6)" }} />
       <span
-        className="absolute left-14 top-1/3 h-px w-12 origin-left -rotate-12 bg-foreground/40"
+        className="absolute left-14 top-1/3 h-px w-12 origin-left -rotate-12"
         style={{
+          color: "#dc2626",
           backgroundImage:
             "repeating-linear-gradient(90deg, currentColor 0 3px, transparent 3px 6px)",
         }}
@@ -407,26 +458,26 @@ function DuelPreview() {
   return (
     <div className="relative h-24 w-36 border border-line">
       <span className="absolute left-1/2 top-2 bottom-2 w-px bg-line" />
-      <span className="absolute left-3 top-1/2 h-10 w-3 -translate-y-1/2 bg-accent" />
-      <span className="absolute right-3 top-1/3 h-10 w-3 bg-foreground" />
-      <span className="absolute left-8 top-1/2 h-1 w-3 -translate-y-1/2 bg-accent" />
-      <span className="absolute right-8 top-1/2 h-1 w-3 -translate-y-1/2 bg-foreground" />
+      <span className="absolute left-3 top-1/2 h-10 w-3 -translate-y-1/2" style={{ background: "#ef4444" }} />
+      <span className="absolute right-3 top-1/3 h-10 w-3" style={{ background: "#3b82f6" }} />
+      <span className="absolute left-8 top-1/2 h-1 w-3 -translate-y-1/2" style={{ background: "#ef4444" }} />
+      <span className="absolute right-8 top-1/2 h-1 w-3 -translate-y-1/2" style={{ background: "#3b82f6" }} />
     </div>
   );
 }
 
 function GeometryDashPreview() {
   return (
-    <div className="relative h-24 w-36 border border-line">
-      <span className="absolute left-0 right-0 bottom-3 h-px bg-line" />
-      <span className="absolute left-3 bottom-3 h-4 w-4 bg-accent" />
+    <div className="relative h-24 w-36 border border-line" style={{ background: "linear-gradient(135deg, #1e1b4b, #312e81)" }}>
+      <span className="absolute left-0 right-0 bottom-3 h-px" style={{ background: "#a78bfa" }} />
+      <span className="absolute left-3 bottom-3 h-4 w-4" style={{ background: "#22d3ee" }} />
       <span
-        className="absolute left-16 bottom-3 h-3 w-3 bg-foreground/70"
-        style={{ clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)" }}
+        className="absolute left-16 bottom-3 h-3 w-3"
+        style={{ clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)", background: "#f472b6" }}
       />
       <span
-        className="absolute left-24 bottom-3 h-4 w-4 bg-foreground/70"
-        style={{ clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)" }}
+        className="absolute left-24 bottom-3 h-4 w-4"
+        style={{ clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)", background: "#f472b6" }}
       />
     </div>
   );
@@ -435,27 +486,27 @@ function GeometryDashPreview() {
 function BallFallPreview() {
   return (
     <div className="relative h-24 w-32 border border-line">
-      <span className="absolute left-1/2 top-2 h-2 w-2 -translate-x-1/2 rounded-full bg-foreground" />
-      <span className="absolute left-0 top-7 h-1 w-8 bg-accent/70" />
-      <span className="absolute right-0 top-7 h-1 w-16 bg-accent/70" />
-      <span className="absolute left-0 top-12 h-1 w-20 bg-accent/70" />
-      <span className="absolute right-0 top-12 h-1 w-4 bg-accent/70" />
-      <span className="absolute left-0 top-16 h-1 w-12 bg-accent/70" />
-      <span className="absolute right-0 top-16 h-1 w-12 bg-accent/70" />
-      <span className="absolute left-0 bottom-3 h-1 w-6 bg-accent/70" />
-      <span className="absolute right-0 bottom-3 h-1 w-20 bg-accent/70" />
+      <span className="absolute left-1/2 top-2 h-2 w-2 -translate-x-1/2 rounded-full" style={{ background: "#f97316" }} />
+      <span className="absolute left-0 top-7 h-1 w-8" style={{ background: "#22d3ee" }} />
+      <span className="absolute right-0 top-7 h-1 w-16" style={{ background: "#22d3ee" }} />
+      <span className="absolute left-0 top-12 h-1 w-20" style={{ background: "#a78bfa" }} />
+      <span className="absolute right-0 top-12 h-1 w-4" style={{ background: "#a78bfa" }} />
+      <span className="absolute left-0 top-16 h-1 w-12" style={{ background: "#f472b6" }} />
+      <span className="absolute right-0 top-16 h-1 w-12" style={{ background: "#f472b6" }} />
+      <span className="absolute left-0 bottom-3 h-1 w-6" style={{ background: "#facc15" }} />
+      <span className="absolute right-0 bottom-3 h-1 w-20" style={{ background: "#facc15" }} />
     </div>
   );
 }
 
 function SubwaySurfersPreview() {
   return (
-    <div className="relative h-24 w-32 border border-line">
-      <span className="absolute left-1/3 top-0 bottom-0 w-px bg-line" />
-      <span className="absolute left-2/3 top-0 bottom-0 w-px bg-line" />
-      <span className="absolute left-3 bottom-3 h-4 w-3 bg-accent" />
-      <span className="absolute left-1/2 top-6 h-5 w-5 -translate-x-1/2 bg-foreground/70" />
-      <span className="absolute right-3 top-12 h-4 w-3 bg-foreground/70" />
+    <div className="relative h-24 w-32 border border-line" style={{ background: "linear-gradient(to bottom, #1f2937, #374151)" }}>
+      <span className="absolute left-1/3 top-0 bottom-0 w-px" style={{ background: "#facc15" }} />
+      <span className="absolute left-2/3 top-0 bottom-0 w-px" style={{ background: "#facc15" }} />
+      <span className="absolute left-3 bottom-3 h-4 w-3" style={{ background: "#ec4899" }} />
+      <span className="absolute left-1/2 top-6 h-5 w-5 -translate-x-1/2" style={{ background: "#f97316" }} />
+      <span className="absolute right-3 top-12 h-4 w-3" style={{ background: "#22d3ee" }} />
     </div>
   );
 }
@@ -463,11 +514,11 @@ function SubwaySurfersPreview() {
 function FruitStabPreview() {
   return (
     <div className="relative h-24 w-24">
-      <span className="absolute inset-2 rounded-full border border-line" />
-      <span className="absolute left-1/2 top-2 h-3 w-3 -translate-x-1/2 rounded-full bg-accent" />
-      <span className="absolute left-1/2 top-0 h-3 w-px -translate-x-1/2 bg-foreground" />
-      <span className="absolute right-3 top-1/2 h-3 w-px -translate-y-1/2 rotate-90 bg-foreground" />
-      <span className="absolute left-3 top-1/2 h-3 w-px -translate-y-1/2 rotate-90 bg-foreground" />
+      <span className="absolute inset-2 rounded-full" style={{ background: "#ef4444", border: "2px solid #b91c1c" }} />
+      <span className="absolute left-1/2 top-1 h-3 w-1 -translate-x-1/2" style={{ background: "#15803d" }} />
+      <span className="absolute left-1/2 top-2 h-3 w-px -translate-x-1/2" style={{ background: "#9ca3af" }} />
+      <span className="absolute right-3 top-1/2 h-3 w-px -translate-y-1/2 rotate-90" style={{ background: "#9ca3af" }} />
+      <span className="absolute left-3 top-1/2 h-3 w-px -translate-y-1/2 rotate-90" style={{ background: "#9ca3af" }} />
     </div>
   );
 }
@@ -477,11 +528,11 @@ function DriftBossPreview() {
     <svg viewBox="0 0 100 80" className="h-24 w-32">
       <path
         d="M 10 70 Q 30 70 30 50 Q 30 30 50 30 Q 70 30 70 50 Q 70 70 90 70"
-        stroke="var(--line)"
+        stroke="#7dd3fc"
         strokeWidth="10"
         fill="none"
       />
-      <circle cx="50" cy="30" r="3" fill="var(--accent)" />
+      <circle cx="50" cy="30" r="4" fill="#ec4899" />
     </svg>
   );
 }
@@ -489,25 +540,25 @@ function DriftBossPreview() {
 function FlappyDunkPreview() {
   return (
     <div className="relative h-24 w-24 border border-line">
-      <span className="absolute left-1/2 top-3 h-3 w-3 -translate-x-1/2 rounded-full bg-foreground" />
-      <span className="absolute left-1/4 right-1/4 bottom-6 h-px bg-accent" />
-      <span className="absolute left-1/4 bottom-4 h-2 w-px bg-accent" />
-      <span className="absolute right-1/4 bottom-4 h-2 w-px bg-accent" />
+      <span className="absolute left-1/2 top-3 h-3 w-3 -translate-x-1/2 rounded-full" style={{ background: "#f97316" }} />
+      <span className="absolute left-1/4 right-1/4 bottom-6 h-px" style={{ background: "#ef4444" }} />
+      <span className="absolute left-1/4 bottom-4 h-2 w-px" style={{ background: "#ef4444" }} />
+      <span className="absolute right-1/4 bottom-4 h-2 w-px" style={{ background: "#ef4444" }} />
     </div>
   );
 }
 
 function RoadFighterPreview() {
   return (
-    <div className="relative h-24 w-32 border border-line">
-      <span className="absolute top-0 bottom-0 left-0 w-3 bg-line/40" />
-      <span className="absolute top-0 bottom-0 right-0 w-3 bg-line/40" />
-      <span className="absolute left-1/2 top-1 h-2 w-px -translate-x-1/2 bg-foreground/40" />
-      <span className="absolute left-1/2 top-7 h-2 w-px -translate-x-1/2 bg-foreground/40" />
-      <span className="absolute left-1/2 top-13 h-2 w-px -translate-x-1/2 bg-foreground/40" />
-      <span className="absolute left-5 top-4 h-4 w-3 bg-foreground/70" />
-      <span className="absolute right-6 top-10 h-4 w-3 bg-foreground/70" />
-      <span className="absolute left-1/2 bottom-2 h-5 w-3 -translate-x-1/2 bg-accent" />
+    <div className="relative h-24 w-32 border border-line" style={{ background: "#1f2937" }}>
+      <span className="absolute top-0 bottom-0 left-0 w-3" style={{ background: "#16a34a" }} />
+      <span className="absolute top-0 bottom-0 right-0 w-3" style={{ background: "#16a34a" }} />
+      <span className="absolute left-1/2 top-1 h-2 w-px -translate-x-1/2" style={{ background: "#facc15" }} />
+      <span className="absolute left-1/2 top-7 h-2 w-px -translate-x-1/2" style={{ background: "#facc15" }} />
+      <span className="absolute left-1/2 top-13 h-2 w-px -translate-x-1/2" style={{ background: "#facc15" }} />
+      <span className="absolute left-5 top-4 h-4 w-3" style={{ background: "#3b82f6" }} />
+      <span className="absolute right-6 top-10 h-4 w-3" style={{ background: "#a78bfa" }} />
+      <span className="absolute left-1/2 bottom-2 h-5 w-3 -translate-x-1/2" style={{ background: "#ef4444" }} />
     </div>
   );
 }
@@ -515,24 +566,27 @@ function RoadFighterPreview() {
 function JumpUpPreview() {
   return (
     <div className="relative h-24 w-24 border border-line">
-      <span className="absolute left-3 top-3 h-1 w-8 bg-accent/70" />
-      <span className="absolute right-3 top-9 h-1 w-10 bg-accent/70" />
-      <span className="absolute left-2 top-16 h-1 w-9 bg-accent/70" />
-      <span className="absolute left-1/2 top-12 h-3 w-3 -translate-x-1/2 bg-foreground" />
-      <span className="absolute right-3 bottom-3 h-1 w-12 bg-accent/70" />
+      <span className="absolute left-3 top-3 h-1 w-8" style={{ background: "#f472b6" }} />
+      <span className="absolute right-3 top-9 h-1 w-10" style={{ background: "#22d3ee" }} />
+      <span className="absolute left-2 top-16 h-1 w-9" style={{ background: "#a78bfa" }} />
+      <span className="absolute left-1/2 top-12 h-3 w-3 -translate-x-1/2 rounded-full" style={{ background: "#facc15" }} />
+      <span className="absolute right-3 bottom-3 h-1 w-12" style={{ background: "#4ade80" }} />
     </div>
   );
 }
 
 function CatsPreview() {
+  const palette = ["#f472b6", "#facc15", "#22d3ee", "#a78bfa", "#fb7185", "#4ade80", "#fb923c", "#60a5fa"];
+  const filledMap: Record<number, number> = { 0: 0, 1: 1, 5: 2, 6: 3, 10: 4, 11: 5, 14: 6, 15: 7 };
   return (
     <div className="grid grid-cols-4 gap-1">
       {Array.from({ length: 16 }).map((_, i) => {
-        const filled = [0, 1, 5, 6, 10, 11, 14, 15].includes(i);
+        const idx = filledMap[i];
         return (
           <span
             key={i}
-            className={`h-5 w-5 border border-line ${filled ? "bg-accent/70" : ""}`}
+            className="h-5 w-5 rounded-sm border border-line"
+            style={{ background: idx !== undefined ? palette[idx] : undefined }}
           />
         );
       })}
@@ -542,86 +596,97 @@ function CatsPreview() {
 
 function SpaceInvadersPreview() {
   return (
-    <div className="relative h-24 w-32 border border-line">
-      <span className="absolute left-3 top-3 h-2 w-3 bg-rose-500/80" />
-      <span className="absolute left-10 top-3 h-2 w-3 bg-rose-500/80" />
-      <span className="absolute right-3 top-3 h-2 w-3 bg-rose-500/80" />
-      <span className="absolute left-3 top-9 h-2 w-3 bg-accent" />
-      <span className="absolute left-10 top-9 h-2 w-3 bg-accent" />
-      <span className="absolute right-3 top-9 h-2 w-3 bg-accent" />
-      <span className="absolute left-1/2 top-14 h-3 w-px -translate-x-1/2 bg-foreground" />
-      <span className="absolute left-1/2 bottom-3 h-2 w-6 -translate-x-1/2 bg-foreground" />
+    <div className="relative h-24 w-32 border border-line" style={{ background: "#020617" }}>
+      <span className="absolute left-3 top-3 h-2 w-3" style={{ background: "#f472b6" }} />
+      <span className="absolute left-10 top-3 h-2 w-3" style={{ background: "#f472b6" }} />
+      <span className="absolute right-3 top-3 h-2 w-3" style={{ background: "#f472b6" }} />
+      <span className="absolute left-3 top-9 h-2 w-3" style={{ background: "#4ade80" }} />
+      <span className="absolute left-10 top-9 h-2 w-3" style={{ background: "#4ade80" }} />
+      <span className="absolute right-3 top-9 h-2 w-3" style={{ background: "#4ade80" }} />
+      <span className="absolute left-1/2 top-14 h-3 w-px -translate-x-1/2" style={{ background: "#facc15" }} />
+      <span className="absolute left-1/2 bottom-3 h-2 w-6 -translate-x-1/2" style={{ background: "#22d3ee" }} />
     </div>
   );
 }
 
 function TennisPreview() {
   return (
-    <div className="relative h-24 w-32 border border-line">
-      <span className="absolute left-1/2 top-2 bottom-2 w-px bg-line" />
-      <span className="absolute left-2 top-1/3 h-8 w-1 bg-accent" />
-      <span className="absolute right-2 bottom-1/3 h-8 w-1 bg-foreground" />
-      <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground" />
+    <div className="relative h-24 w-32 border border-line" style={{ background: "#15803d" }}>
+      <span className="absolute left-1/2 top-2 bottom-2 w-px" style={{ background: "rgba(255,255,255,0.5)" }} />
+      <span className="absolute left-2 top-1/3 h-8 w-1" style={{ background: "#ef4444" }} />
+      <span className="absolute right-2 bottom-1/3 h-8 w-1" style={{ background: "#3b82f6" }} />
+      <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: "#fde047" }} />
     </div>
   );
 }
 
 function PacmanPreview() {
   return (
-    <div className="relative h-24 w-24 border border-line">
-      <span className="absolute left-2 right-2 top-2 h-1 bg-line" />
-      <span className="absolute left-2 top-2 bottom-2 w-1 bg-line" />
-      <span className="absolute right-2 top-2 bottom-2 w-1 bg-line" />
-      <span className="absolute left-2 right-2 bottom-2 h-1 bg-line" />
-      <span className="absolute left-5 top-5 h-3 w-3 rounded-full bg-accent" />
-      <span className="absolute right-5 top-1/2 h-3 w-3 rounded-t-full bg-rose-500/80" />
-      <span className="absolute left-1/2 bottom-5 h-1 w-1 -translate-x-1/2 rounded-full bg-muted" />
-      <span className="absolute left-1/3 top-1/3 h-1 w-1 rounded-full bg-muted" />
+    <div className="relative h-24 w-24 border border-line" style={{ background: "#020617" }}>
+      <span className="absolute left-2 right-2 top-2 h-1" style={{ background: "#3b82f6" }} />
+      <span className="absolute left-2 top-2 bottom-2 w-1" style={{ background: "#3b82f6" }} />
+      <span className="absolute right-2 top-2 bottom-2 w-1" style={{ background: "#3b82f6" }} />
+      <span className="absolute left-2 right-2 bottom-2 h-1" style={{ background: "#3b82f6" }} />
+      <span className="absolute left-5 top-5 h-3 w-3 rounded-full" style={{ background: "#facc15" }} />
+      <span className="absolute right-5 top-1/2 h-3 w-3 rounded-t-full" style={{ background: "#ef4444" }} />
+      <span className="absolute left-1/2 bottom-5 h-1 w-1 -translate-x-1/2 rounded-full" style={{ background: "#22d3ee" }} />
+      <span className="absolute left-1/3 top-1/3 h-1 w-1 rounded-full" style={{ background: "#f472b6" }} />
     </div>
   );
 }
 
 function FlowFreePreview() {
+  const colorMap: Record<number, string> = {
+    0: "#ef4444",
+    4: "#ef4444",
+    8: "#ef4444",
+    9: "#ef4444",
+    10: "#ef4444",
+    11: "#ef4444",
+    15: "#ef4444",
+    3: "#3b82f6",
+    7: "#3b82f6",
+    13: "#3b82f6",
+    14: "#3b82f6",
+    2: "#facc15",
+    6: "#facc15",
+  };
   return (
     <div className="grid grid-cols-4 gap-1">
-      {Array.from({ length: 16 }).map((_, i) => {
-        const accent = [0, 4, 8, 9, 10, 11, 15].includes(i);
-        const foreground = [3, 7, 13, 14].includes(i);
-        return (
-          <span
-            key={i}
-            className={`h-4 w-4 border border-line ${
-              accent
-                ? "bg-accent/70"
-                : foreground
-                  ? "bg-foreground/60"
-                  : ""
-            }`}
-          />
-        );
-      })}
+      {Array.from({ length: 16 }).map((_, i) => (
+        <span
+          key={i}
+          className="h-4 w-4 rounded-sm border border-line"
+          style={{ background: colorMap[i] }}
+        />
+      ))}
     </div>
   );
 }
 
 function TetrisPreview() {
   // 4 cols x 6 rows: a falling T-piece up top, a partial stack below.
-  const cells: ("a" | "f" | "")[] = [
-    "", "a", "",  "",
-    "a", "a", "a", "",
+  const cells: string[] = [
+    "", "T", "",  "",
+    "T", "T", "T", "",
     "",  "",  "",  "",
-    "",  "",  "f", "f",
-    "f", "f", "",  "f",
-    "f", "a", "a", "f",
+    "",  "",  "O", "O",
+    "L", "L", "",  "O",
+    "L", "S", "S", "O",
   ];
+  const colors: Record<string, string> = {
+    T: "#a855f7",
+    O: "#facc15",
+    L: "#f97316",
+    S: "#22c55e",
+  };
   return (
     <div className="grid grid-cols-4 gap-px bg-line p-px">
       {cells.map((c, i) => (
         <span
           key={i}
-          className={`h-3 w-3 ${
-            c === "a" ? "bg-accent/80" : c === "f" ? "bg-foreground/60" : "bg-background"
-          }`}
+          className="h-3 w-3"
+          style={{ background: colors[c] ?? "var(--background)" }}
         />
       ))}
     </div>
@@ -630,13 +695,13 @@ function TetrisPreview() {
 
 function VampireSurvivorsPreview() {
   return (
-    <div className="relative h-24 w-32 border border-line">
-      <span className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 bg-accent" />
-      <span className="absolute left-3 top-3 h-2 w-2 bg-foreground/70" />
-      <span className="absolute right-4 top-6 h-2 w-2 bg-foreground/70" />
-      <span className="absolute left-8 bottom-3 h-2 w-2 bg-foreground/70" />
-      <span className="absolute right-3 bottom-5 h-2 w-2 bg-foreground/70" />
-      <span className="absolute left-1/2 top-1/2 h-px w-6 -translate-y-1/2 bg-accent/60" />
+    <div className="relative h-24 w-32 border border-line" style={{ background: "#1e1b4b" }}>
+      <span className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: "#facc15", boxShadow: "0 0 8px #facc15" }} />
+      <span className="absolute left-3 top-3 h-2 w-2 rounded-full" style={{ background: "#ef4444" }} />
+      <span className="absolute right-4 top-6 h-2 w-2 rounded-full" style={{ background: "#ef4444" }} />
+      <span className="absolute left-8 bottom-3 h-2 w-2 rounded-full" style={{ background: "#a855f7" }} />
+      <span className="absolute right-3 bottom-5 h-2 w-2 rounded-full" style={{ background: "#a855f7" }} />
+      <span className="absolute left-1/2 top-1/2 h-px w-8 -translate-y-1/2" style={{ background: "linear-gradient(to right, #facc15, transparent)" }} />
     </div>
   );
 }

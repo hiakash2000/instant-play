@@ -315,50 +315,53 @@ export default function SpaceInvadersGame() {
           onPointerMove={onBoardPointerMove}
           onPointerUp={onBoardPointerUp}
           onPointerCancel={() => (touchRef.current = null)}
-          className="relative overflow-hidden border border-line bg-surface select-none touch-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
+          className="relative overflow-hidden border border-line select-none touch-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none", background: "#020617" }}
           aria-label="Space Invaders"
         >
-          {aliens.current.map((a) => (
-            <span
-              key={`${a.row}-${a.col}`}
-              className={
-                a.row === 0
-                  ? "absolute bg-rose-500/80"
-                  : a.row === 1
-                    ? "absolute bg-accent"
-                    : "absolute bg-accent/70"
-              }
-              style={{ left: a.x, top: a.y, width: ALIEN_W, height: ALIEN_H }}
-            />
-          ))}
+          {aliens.current.map((a) => {
+            const alienColor =
+              a.row === 0
+                ? "#f472b6"
+                : a.row === 1 || a.row === 2
+                  ? "#4ade80"
+                  : "#22d3ee";
+            return (
+              <span
+                key={`${a.row}-${a.col}`}
+                className="absolute"
+                style={{ left: a.x, top: a.y, width: ALIEN_W, height: ALIEN_H, background: alienColor }}
+              />
+            );
+          })}
           {bullets.current.map((b, i) => (
             <span
               key={`bul-${i}`}
-              className="absolute bg-foreground"
-              style={{ left: b.x, top: b.y, width: BULLET_W, height: BULLET_H }}
+              className="absolute"
+              style={{ left: b.x, top: b.y, width: BULLET_W, height: BULLET_H, background: "#facc15" }}
             />
           ))}
           {bombs.current.map((m, i) => (
             <span
               key={`bomb-${i}`}
-              className="absolute bg-rose-500/80"
-              style={{ left: m.x, top: m.y, width: 3, height: 8 }}
+              className="absolute"
+              style={{ left: m.x, top: m.y, width: 3, height: 8, background: "#facc15" }}
             />
           ))}
           <span
-            className="absolute bg-foreground"
+            className="absolute"
             style={{
               left: playerX.current,
               top: PLAYER_Y,
               width: PLAYER_W,
               height: PLAYER_H,
+              background: "#22d3ee",
             }}
             aria-hidden
           />
           <span
-            className="absolute left-0 right-0 bg-line"
-            style={{ top: PLAYER_Y - 8, height: 1 }}
+            className="absolute left-0 right-0"
+            style={{ top: PLAYER_Y - 8, height: 1, background: "#22d3ee", opacity: 0.4 }}
             aria-hidden
           />
           {phase !== "playing" && (

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import MobileFullscreen from "../MobileFullscreen";
 import JumpUpGame from "./JumpUpGame";
 
 export const metadata: Metadata = {
-  title: "Jump Up · InstantPlay",
+  title: "Jump Up · GetInstantPlay",
 };
 
 export default function Page() {
@@ -19,7 +20,9 @@ export default function Page() {
         next plank. The higher you climb, the more the planks slide.
       </p>
       <div className="mt-12">
-        <JumpUpGame />
+        <MobileFullscreen orientation="portrait">
+          <JumpUpGame />
+        </MobileFullscreen>
       </div>
     </div>
   );

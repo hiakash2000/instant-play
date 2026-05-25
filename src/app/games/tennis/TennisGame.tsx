@@ -214,44 +214,47 @@ export default function TennisGame() {
           onPointerMove={onBoardPointerMove}
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
-          className="relative overflow-hidden border border-line bg-surface select-none touch-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
+          className="relative overflow-hidden border border-line select-none touch-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none", background: "#15803d" }}
           aria-label="Tennis"
         >
           {Array.from({ length: 16 }).map((_, i) => (
             <span
               key={i}
-              className="absolute left-1/2 w-px bg-line"
-              style={{ top: i * 24 + 4, height: 14 }}
+              className="absolute left-1/2"
+              style={{ top: i * 24 + 4, height: 14, width: 1, background: "rgba(255,255,255,0.5)" }}
             />
           ))}
           <span
-            className="absolute bg-accent"
+            className="absolute"
             style={{
               left: PLAYER_X,
               top: playerY.current,
               width: PADDLE_W,
               height: PADDLE_H,
+              background: "#ef4444",
             }}
             aria-hidden
           />
           <span
-            className="absolute bg-foreground"
+            className="absolute"
             style={{
               left: AI_X,
               top: aiY.current,
               width: PADDLE_W,
               height: PADDLE_H,
+              background: "#3b82f6",
             }}
             aria-hidden
           />
           <span
-            className="absolute rounded-full bg-foreground"
+            className="absolute rounded-full"
             style={{
               left: ball.current.x - BALL_R,
               top: ball.current.y - BALL_R,
               width: BALL_R * 2,
               height: BALL_R * 2,
+              background: "#fde047",
             }}
             aria-hidden
           />

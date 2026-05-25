@@ -138,40 +138,47 @@ export default function FlappyGame() {
             e.preventDefault();
             flap();
           }}
-          className="relative overflow-hidden border border-line bg-surface touch-manipulation select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation" }}
+          className="relative overflow-hidden border border-line touch-manipulation select-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation", background: "linear-gradient(to bottom, #7dd3fc, #bae6fd)" }}
           aria-label="Flap"
         >
+          <span
+            className="absolute left-0 right-0 bottom-0"
+            style={{ height: 12, background: "#a16207" }}
+          />
           {pipes.current.map((p, i) => (
             <span key={i}>
               <span
-                className="absolute bg-accent/70"
+                className="absolute"
                 style={{
                   left: p.x,
                   top: 0,
                   width: PIPE_W,
                   height: p.gapY,
+                  background: "#22c55e",
                 }}
               />
               <span
-                className="absolute bg-accent/70"
+                className="absolute"
                 style={{
                   left: p.x,
                   top: p.gapY + PIPE_GAP,
                   width: PIPE_W,
                   height: HEIGHT - (p.gapY + PIPE_GAP),
+                  background: "#22c55e",
                 }}
               />
             </span>
           ))}
           <span
-            className="absolute rounded-full bg-foreground"
+            className="absolute rounded-full"
             style={{
               left: BIRD_X - BIRD_R,
               top: birdY.current - BIRD_R,
               width: BIRD_R * 2,
               height: BIRD_R * 2,
               transform: `rotate(${rotation}deg)`,
+              background: "#facc15",
             }}
           />
           {phase !== "playing" && (

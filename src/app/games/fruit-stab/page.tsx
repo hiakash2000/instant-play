@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import MobileFullscreen from "../MobileFullscreen";
 import FruitStabGame from "./FruitStabGame";
 
 export const metadata: Metadata = {
-  title: "Fruit Stab · InstantPlay",
+  title: "Fruit Stab · GetInstantPlay",
 };
 
 export default function Page() {
@@ -19,7 +20,9 @@ export default function Page() {
         there.
       </p>
       <div className="mt-12">
-        <FruitStabGame />
+        <MobileFullscreen orientation="portrait">
+          <FruitStabGame />
+        </MobileFullscreen>
       </div>
     </div>
   );

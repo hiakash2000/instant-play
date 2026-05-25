@@ -219,34 +219,37 @@ export default function DuelGame() {
           />
           {/* Player */}
           <span
-            className="absolute bg-accent"
+            className="absolute"
             style={{
               left: PLAYER_X,
               top: playerY.current,
               width: FIGHTER_W,
               height: FIGHTER_H,
+              background: "#ef4444",
             }}
           />
           {/* Enemy */}
           <span
-            className="absolute bg-foreground"
+            className="absolute"
             style={{
               left: ENEMY_X,
               top: enemyY.current,
               width: FIGHTER_W,
               height: FIGHTER_H,
+              background: "#3b82f6",
             }}
           />
           {/* Bullets */}
           {bullets.current.map((b, i) => (
             <span
               key={i}
-              className={`absolute ${b.from === "player" ? "bg-accent" : "bg-foreground"}`}
+              className="absolute"
               style={{
                 left: b.x,
                 top: b.y,
                 width: BULLET_W,
                 height: BULLET_H,
+                background: b.from === "player" ? "#ef4444" : "#3b82f6",
               }}
             />
           ))}

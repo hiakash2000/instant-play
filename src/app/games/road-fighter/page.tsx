@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import MobileFullscreen from "../MobileFullscreen";
 import RoadFighterGame from "./RoadFighterGame";
 
 export const metadata: Metadata = {
-  title: "Road Fighter · InstantPlay",
+  title: "Road Fighter · GetInstantPlay",
 };
 
 export default function Page() {
@@ -20,7 +21,9 @@ export default function Page() {
         moves.
       </p>
       <div className="mt-12">
-        <RoadFighterGame />
+        <MobileFullscreen orientation="portrait">
+          <RoadFighterGame />
+        </MobileFullscreen>
       </div>
     </div>
   );

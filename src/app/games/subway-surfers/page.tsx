@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import MobileFullscreen from "../MobileFullscreen";
 import SubwaySurfersGame from "./SubwaySurfersGame";
 
 export const metadata: Metadata = {
-  title: "Subway Surfers · InstantPlay",
+  title: "Subway Surfers · GetInstantPlay",
 };
 
 export default function Page() {
@@ -18,7 +19,9 @@ export default function Page() {
         Three lanes, one runner, an endless yard of trains and barriers.
       </p>
       <div className="mt-12">
-        <SubwaySurfersGame />
+        <MobileFullscreen orientation="portrait">
+          <SubwaySurfersGame />
+        </MobileFullscreen>
       </div>
     </div>
   );

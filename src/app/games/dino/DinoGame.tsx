@@ -149,35 +149,37 @@ export default function DinoGame() {
             e.preventDefault();
             jump();
           }}
-          className="relative overflow-hidden border border-line bg-surface text-left touch-manipulation select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation" }}
+          className="relative overflow-hidden border border-line text-left touch-manipulation select-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation", background: "linear-gradient(to bottom, #fde68a, #fcd34d)" }}
           aria-label="Jump"
         >
           {/* Ground line */}
           <span
-            className="absolute bg-line"
-            style={{ left: 0, right: 0, top: GROUND_Y, height: 1 }}
+            className="absolute"
+            style={{ left: 0, right: 0, top: GROUND_Y, height: 2, background: "#92400e" }}
           />
           {/* Dino */}
           <span
-            className="absolute bg-accent"
+            className="absolute"
             style={{
               left: DINO_X,
               top: dinoY.current,
               width: DINO_W,
               height: DINO_H,
+              background: "#0f766e",
             }}
           />
           {/* Obstacles */}
           {obstacles.current.map((o, i) => (
             <span
               key={i}
-              className="absolute bg-foreground/80"
+              className="absolute"
               style={{
                 left: o.x,
                 top: GROUND_Y - o.h,
                 width: o.w,
                 height: o.h,
+                background: "#15803d",
               }}
             />
           ))}

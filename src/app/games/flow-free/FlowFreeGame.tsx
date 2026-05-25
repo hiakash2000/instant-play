@@ -51,12 +51,13 @@ const LEVELS: Level[] = [
   },
 ];
 
-const COLOR_CLASS: Record<string, string> = {
-  rose: "bg-rose-500",
-  amber: "bg-amber-400",
-  sky: "bg-sky-500",
-  emerald: "bg-emerald-500",
-  fuchsia: "bg-fuchsia-500",
+const COLOR_HEX: Record<string, string> = {
+  rose: "#ef4444",
+  amber: "#facc15",
+  sky: "#3b82f6",
+  emerald: "#22c55e",
+  fuchsia: "#a855f7",
+  orange: "#f97316",
 };
 
 const CELL = 56;
@@ -194,12 +195,14 @@ export default function FlowFreeGame() {
                 >
                   {color && !ep && (
                     <span
-                      className={`absolute inset-2 ${COLOR_CLASS[color]} opacity-70`}
+                      className="absolute inset-2 opacity-70"
+                      style={{ background: COLOR_HEX[color] }}
                     />
                   )}
                   {ep && (
                     <span
-                      className={`absolute left-1/2 top-1/2 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full ${COLOR_CLASS[ep.color]}`}
+                      className="absolute left-1/2 top-1/2 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                      style={{ background: COLOR_HEX[ep.color] }}
                     />
                   )}
                 </span>

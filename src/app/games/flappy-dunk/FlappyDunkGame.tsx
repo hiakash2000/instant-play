@@ -132,32 +132,33 @@ export default function FlappyDunkGame() {
             e.preventDefault();
             tap();
           }}
-          className="relative overflow-hidden border border-line bg-surface touch-manipulation select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation" }}
+          className="relative overflow-hidden border border-line touch-manipulation select-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation", background: "linear-gradient(to bottom, #fef3c7, #fde68a)" }}
           aria-label="Tap"
         >
           {/* hoop: two side bars and rim */}
           <span
-            className="absolute bg-accent"
-            style={{ left: h.x, top: h.y, width: (HOOP_W - HOOP_OPENING) / 2, height: 6 }}
+            className="absolute"
+            style={{ left: h.x, top: h.y, width: (HOOP_W - HOOP_OPENING) / 2, height: 6, background: "#ef4444" }}
           />
           <span
-            className="absolute bg-accent"
+            className="absolute"
             style={{
               left: h.x + (HOOP_W + HOOP_OPENING) / 2,
               top: h.y,
               width: (HOOP_W - HOOP_OPENING) / 2,
               height: 6,
+              background: "#ef4444",
             }}
           />
           <span
-            className="absolute bg-accent/40"
-            style={{ left: h.x + (HOOP_W - HOOP_OPENING) / 2, top: h.y + 6, width: HOOP_OPENING, height: 1 }}
+            className="absolute"
+            style={{ left: h.x + (HOOP_W - HOOP_OPENING) / 2, top: h.y + 6, width: HOOP_OPENING, height: 18, background: "#fca5a5", opacity: 0.7 }}
           />
 
           <span
-            className="absolute rounded-full bg-foreground"
-            style={{ left: b.x - BALL_R, top: b.y - BALL_R, width: BALL_R * 2, height: BALL_R * 2 }}
+            className="absolute rounded-full"
+            style={{ left: b.x - BALL_R, top: b.y - BALL_R, width: BALL_R * 2, height: BALL_R * 2, background: "#f97316" }}
           />
           {phase !== "playing" && (
             <span className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 text-center">

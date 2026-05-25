@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import MobileFullscreen from "../MobileFullscreen";
 import TetrisGame from "./TetrisGame";
 
 export const metadata: Metadata = {
-  title: "Tetris · InstantPlay",
+  title: "Tetris · GetInstantPlay",
 };
 
 export default function Page() {
@@ -19,7 +20,9 @@ export default function Page() {
         creeps up. Four lines at once is the only Tetris that matters.
       </p>
       <div className="mt-12">
-        <TetrisGame />
+        <MobileFullscreen orientation="portrait">
+          <TetrisGame />
+        </MobileFullscreen>
       </div>
     </div>
   );

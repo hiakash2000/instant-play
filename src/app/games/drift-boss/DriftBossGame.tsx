@@ -137,8 +137,8 @@ export default function DriftBossGame() {
             e.preventDefault();
             flip();
           }}
-          className="relative overflow-hidden border border-line bg-surface touch-manipulation select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation" }}
+          className="relative overflow-hidden border border-line touch-manipulation select-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation", background: "#0c4a6e" }}
           aria-label="Flip"
         >
           {tilesRef.current.map((t, i) => {
@@ -150,23 +150,25 @@ export default function DriftBossGame() {
             return (
               <span
                 key={i}
-                className="absolute bg-line"
+                className="absolute"
                 style={{
                   left: sx,
                   top: sy,
                   width: TILE - 2,
                   height: TILE - 2,
+                  background: "#7dd3fc",
                 }}
               />
             );
           })}
           <span
-            className="absolute bg-accent"
+            className="absolute"
             style={{
               left: carRef.current.gx * TILE - camOffset.x + 14,
               top: carRef.current.gy * TILE - camOffset.y + 14,
               width: TILE - 30,
               height: TILE - 30,
+              background: "#ec4899",
             }}
             aria-hidden
           />

@@ -59,15 +59,15 @@ const SHAPES: number[][][][] = [
   ],
 ];
 
-const COLOR_CLASSES = [
+const COLOR_HEX = [
   "",
-  "bg-sky-400",
-  "bg-yellow-400",
-  "bg-fuchsia-400",
-  "bg-emerald-400",
-  "bg-rose-500",
-  "bg-orange-400",
-  "bg-blue-500",
+  "#22d3ee",
+  "#facc15",
+  "#a855f7",
+  "#22c55e",
+  "#ef4444",
+  "#3b82f6",
+  "#f97316",
 ];
 
 function makePiece(): Piece {
@@ -373,19 +373,20 @@ export default function TetrisGame() {
           onPointerMove={onBoardPointerMove}
           onPointerUp={onBoardPointerUp}
           onPointerCancel={() => (touchRef.current = null)}
-          className="relative overflow-hidden border border-line bg-surface select-none touch-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
+          className="relative overflow-hidden border border-line select-none touch-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none", background: "#0f172a" }}
         >
           {display.map((row, r) =>
             row.map((cell, c) => (
               <span
                 key={`${r}-${c}`}
-                className={`absolute border border-line/20 ${cell ? COLOR_CLASSES[cell] : ""}`}
+                className="absolute border border-line/20"
                 style={{
                   left: c * CELL,
                   top: r * CELL,
                   width: CELL,
                   height: CELL,
+                  background: cell ? COLOR_HEX[cell] : undefined,
                 }}
               />
             )),

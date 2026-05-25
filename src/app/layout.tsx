@@ -25,7 +25,7 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "InstantPlay",
+  title: "GetInstantPlay",
   description: "A small collection of browser games, instantly playable.",
 };
 
@@ -51,7 +51,7 @@ export default async function RootLayout({
               href="/"
               className="font-serif text-2xl tracking-tight text-foreground"
             >
-              Instant<span className="italic text-accent">play</span>
+              GetInstant<span className="italic text-accent">play</span>
             </Link>
             <div className="hidden items-center gap-6 sm:flex">
               <Link
@@ -69,7 +69,7 @@ export default async function RootLayout({
         <main className="flex flex-1 flex-col">{children}</main>
         <footer className="border-t border-line">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6 text-xs text-muted sm:px-10">
-            <span>© {new Date().getFullYear()} InstantPlay</span>
+            <span>© {new Date().getFullYear()} GetInstantPlay</span>
             <span className="font-mono">v0.1</span>
           </div>
         </footer>

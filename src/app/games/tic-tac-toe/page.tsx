@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import MobileFullscreen from "../MobileFullscreen";
 import TicTacToeBoard from "./TicTacToeBoard";
 
 export const metadata: Metadata = {
-  title: "Tic Tac Toe · InstantPlay",
+  title: "Tic Tac Toe · GetInstantPlay",
 };
 
 export default function Page() {
@@ -19,7 +20,9 @@ export default function Page() {
         best you can do against perfect play is a draw.
       </p>
       <div className="mt-12">
-        <TicTacToeBoard />
+        <MobileFullscreen orientation="portrait">
+          <TicTacToeBoard />
+        </MobileFullscreen>
       </div>
     </div>
   );

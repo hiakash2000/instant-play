@@ -203,48 +203,54 @@ export default function RoadFighterGame() {
           onPointerMove={onBoardPointerMove}
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
-          className="relative overflow-hidden border border-line bg-surface select-none touch-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
+          className="relative overflow-hidden border border-line select-none touch-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none", background: "#16a34a" }}
           aria-label="Drive"
         >
           <span
-            className="absolute top-0 bottom-0 left-0 bg-line/40"
-            style={{ width: ROAD_PAD }}
+            className="absolute top-0 bottom-0 left-0"
+            style={{ width: ROAD_PAD, background: "#16a34a" }}
           />
           <span
-            className="absolute top-0 bottom-0 right-0 bg-line/40"
-            style={{ width: ROAD_PAD }}
+            className="absolute top-0 bottom-0 right-0"
+            style={{ width: ROAD_PAD, background: "#16a34a" }}
           />
           <span
-            className="absolute top-0 bottom-0 bg-foreground/[0.04]"
-            style={{ left: ROAD_LEFT, width: ROAD_WIDTH }}
+            className="absolute top-0 bottom-0"
+            style={{ left: ROAD_LEFT, width: ROAD_WIDTH, background: "#1f2937" }}
           />
           {stripes.map((y, i) => (
             <span
               key={i}
-              className="absolute bg-foreground/40"
+              className="absolute"
               style={{
                 left: WIDTH / 2 - 1,
                 top: y,
                 width: 2,
                 height: 22,
+                background: "#facc15",
               }}
             />
           ))}
-          {enemies.current.map((e, i) => (
-            <span
-              key={i}
-              className={e.tint ? "absolute bg-foreground/80" : "absolute bg-foreground/60"}
-              style={{ left: e.x, top: e.y, width: CAR_W, height: CAR_H }}
-            />
-          ))}
+          {enemies.current.map((e, i) => {
+            const OPP_COLORS = ["#3b82f6", "#a78bfa", "#22d3ee"];
+            const oppColor = OPP_COLORS[i % OPP_COLORS.length];
+            return (
+              <span
+                key={i}
+                className="absolute"
+                style={{ left: e.x, top: e.y, width: CAR_W, height: CAR_H, background: oppColor }}
+              />
+            );
+          })}
           <span
-            className="absolute bg-accent"
+            className="absolute"
             style={{
               left: playerX.current,
               top: PLAYER_Y,
               width: CAR_W,
               height: CAR_H,
+              background: "#ef4444",
             }}
             aria-hidden
           />

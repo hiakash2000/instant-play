@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import MobileFullscreen from "../MobileFullscreen";
 import SnakeGame from "./SnakeGame";
 
 export const metadata: Metadata = {
-  title: "Snake · InstantPlay",
+  title: "Snake · GetInstantPlay",
 };
 
 export default function Page() {
@@ -19,7 +20,9 @@ export default function Page() {
         bite yourself.
       </p>
       <div className="mt-12">
-        <SnakeGame />
+        <MobileFullscreen orientation="landscape">
+          <SnakeGame />
+        </MobileFullscreen>
       </div>
     </div>
   );
