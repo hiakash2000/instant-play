@@ -147,7 +147,14 @@ export default function MobileFullscreen({
     const onChange = () => {
       const d = document as FsDocument;
       const el = d.fullscreenElement ?? d.webkitFullscreenElement ?? null;
-      setIsFullscreen(el === stageRef.current);
+      if (el) {
+        setIsFullscreen(el === stageRef.current);
+      } else if (
+        typeof document.exitFullscreen === "function" ||
+        typeof (document as FsDocument).webkitExitFullscreen === "function"
+      ) {
+        setIsFullscreen(false);
+      }
     };
     document.addEventListener("fullscreenchange", onChange);
     document.addEventListener("webkitfullscreenchange", onChange);
@@ -156,6 +163,15 @@ export default function MobileFullscreen({
       document.removeEventListener("webkitfullscreenchange", onChange);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isFullscreen]);
 
   useEffect(() => {
     if (!isFullscreen) {
@@ -327,13 +343,19 @@ export default function MobileFullscreen({
   const enter = useCallback(async () => {
     const el = stageRef.current as FsElement | null;
     if (!el) return;
+    let nativeEntered = false;
     try {
       if (el.requestFullscreen) {
         await el.requestFullscreen();
+        nativeEntered = true;
       } else if (el.webkitRequestFullscreen) {
         await el.webkitRequestFullscreen();
+        nativeEntered = true;
       }
     } catch {}
+    if (!nativeEntered) {
+      setIsFullscreen(true);
+    }
     const so = screen.orientation as LockableOrientation | undefined;
     if (so?.lock) {
       try {
@@ -344,10 +366,15 @@ export default function MobileFullscreen({
 
   const exit = useCallback(async () => {
     const d = document as FsDocument;
-    try {
-      if (d.exitFullscreen) await d.exitFullscreen();
-      else if (d.webkitExitFullscreen) await d.webkitExitFullscreen();
-    } catch {}
+    const native = d.fullscreenElement ?? d.webkitFullscreenElement ?? null;
+    if (native) {
+      try {
+        if (d.exitFullscreen) await d.exitFullscreen();
+        else if (d.webkitExitFullscreen) await d.webkitExitFullscreen();
+      } catch {}
+    } else {
+      setIsFullscreen(false);
+    }
   }, []);
 
   return (
