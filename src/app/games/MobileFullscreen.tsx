@@ -221,15 +221,9 @@ export default function MobileFullscreen({
 
         const rightCol = outer.children[1] as HTMLElement | undefined;
         if (rightCol) {
-          rightCol
-            .querySelectorAll<HTMLElement>("*")
-            .forEach((el) => {
-              const fs = parseFloat(window.getComputedStyle(el).fontSize);
-              if (fs > 14) {
-                sideSnapsRef.current.push(snapshot(el));
-                el.style.fontSize = `${Math.max(11, Math.round(fs * 0.5))}px`;
-              }
-            });
+          sideSnapsRef.current.push(snapshot(rightCol));
+          (rightCol.style as CSSStyleDeclaration & { zoom?: string }).zoom =
+            "0.55";
         }
       }
     }
