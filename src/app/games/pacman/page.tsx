@@ -23,7 +23,7 @@ export default function Page() {
         the next level with one more ghost.
       </p>
       <div className="mt-12">
-        <MobileFullscreen orientation="landscape">
+        <MobileFullscreen orientation="portrait">
           <PacmanGame />
         </MobileFullscreen>
       </div>

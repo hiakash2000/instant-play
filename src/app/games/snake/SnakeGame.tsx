@@ -232,7 +232,7 @@ export default function SnakeGame() {
           onPointerDown={onBoardPointerDown}
           onPointerUp={onBoardPointerUp}
           onPointerCancel={() => (touchStartRef.current = null)}
-          className="relative w-full max-w-[640px] border border-line bg-surface touch-none select-none"
+          className="relative w-full min-w-[360px] max-w-[640px] border border-line bg-surface touch-none select-none"
           style={{ aspectRatio: `${COLS} / ${ROWS}`, touchAction: "none" }}
         >
           <div

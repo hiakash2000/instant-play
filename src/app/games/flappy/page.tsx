@@ -23,7 +23,7 @@ export default function Page() {
         point.
       </p>
       <div className="mt-12">
-        <MobileFullscreen orientation="landscape">
+        <MobileFullscreen orientation="portrait">
           <FlappyGame />
         </MobileFullscreen>
       </div>

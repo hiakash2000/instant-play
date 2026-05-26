@@ -23,7 +23,7 @@ export default function Page() {
         bite yourself.
       </p>
       <div className="mt-12">
-        <MobileFullscreen orientation="landscape">
+        <MobileFullscreen orientation="portrait">
           <SnakeGame />
         </MobileFullscreen>
       </div>

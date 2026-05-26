@@ -23,7 +23,7 @@ export default function Page() {
         wall. Strafe, fire, clear the formation before it reaches you.
       </p>
       <div className="mt-12">
-        <MobileFullscreen orientation="landscape">
+        <MobileFullscreen orientation="portrait">
           <SpaceInvadersGame />
         </MobileFullscreen>
       </div>
