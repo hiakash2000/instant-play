@@ -129,7 +129,7 @@ export default function MobileFullscreen({
   const hiddenRef = useRef<HTMLElement[]>([]);
   const playfieldSnapRef = useRef<Snapshot | null>(null);
   const scoreMoveRef = useRef<ScoreMove | null>(null);
-  const sideGridSnapRef = useRef<Snapshot | null>(null);
+  const sideSnapsRef = useRef<Snapshot[]>([]);
   const [isMobile, setIsMobile] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [needsRotate, setNeedsRotate] = useState(false);
@@ -177,9 +177,9 @@ export default function MobileFullscreen({
         restore(playfieldSnapRef.current);
         playfieldSnapRef.current = null;
       }
-      if (sideGridSnapRef.current) {
-        restore(sideGridSnapRef.current);
-        sideGridSnapRef.current = null;
+      if (sideSnapsRef.current.length) {
+        sideSnapsRef.current.forEach(restore);
+        sideSnapsRef.current = [];
       }
       return;
     }
@@ -198,10 +198,23 @@ export default function MobileFullscreen({
       const cls =
         outer && typeof outer.className === "string" ? outer.className : "";
       if (outer && cls.includes("grid")) {
-        sideGridSnapRef.current = snapshot(outer);
+        sideSnapsRef.current.push(snapshot(outer));
         outer.style.gridTemplateColumns = "auto auto";
         outer.style.alignItems = "start";
         outer.style.gap = "0.75rem";
+
+        const rightCol = outer.children[1] as HTMLElement | undefined;
+        if (rightCol) {
+          rightCol
+            .querySelectorAll<HTMLElement>("*")
+            .forEach((el) => {
+              const fs = parseFloat(window.getComputedStyle(el).fontSize);
+              if (fs > 14) {
+                sideSnapsRef.current.push(snapshot(el));
+                el.style.fontSize = `${Math.max(11, Math.round(fs * 0.5))}px`;
+              }
+            });
+        }
       }
     }
 
