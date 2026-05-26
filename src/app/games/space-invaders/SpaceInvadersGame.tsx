@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const WIDTH = 400;
 const HEIGHT = 520;
@@ -24,6 +26,7 @@ const BOMB_SPEED = 4;
 const ALIEN_TICKS_INIT = 24;
 const BOMB_CHANCE = 0.012;
 const TICK_MS = 16;
+const PLAYER_COOLDOWN_MS = 300;
 
 type Alien = { x: number; y: number; row: number; col: number };
 type Bullet = { x: number; y: number };
@@ -64,6 +67,7 @@ export default function SpaceInvadersGame() {
   const bullets = useRef<Bullet[]>([]);
   const bombs = useRef<Bomb[]>([]);
   const pressed = useRef({ left: false, right: false });
+  const lastShot = useRef(0);
   const scoreRef = useRef(0);
   const waveRef = useRef(1);
   const phaseRef = useRef(phase);
@@ -109,6 +113,9 @@ export default function SpaceInvadersGame() {
   const fire = useCallback(() => {
     if (phaseRef.current !== "playing") return;
     if (bullets.current.length >= 3) return;
+    const now = performance.now();
+    if (now - lastShot.current < PLAYER_COOLDOWN_MS) return;
+    lastShot.current = now;
     bullets.current.push({
       x: playerX.current + PLAYER_W / 2 - BULLET_W / 2,
       y: PLAYER_Y - BULLET_H,
@@ -118,6 +125,8 @@ export default function SpaceInvadersGame() {
   useEffect(() => {
     if (phase !== "playing") return;
     const id = window.setInterval(() => {
+      fire();
+
       if (pressed.current.left) {
         playerX.current = Math.max(0, playerX.current - PLAYER_SPEED);
       }
@@ -194,6 +203,7 @@ export default function SpaceInvadersGame() {
       aliens.current = remaining;
 
       if (gained > 0) {
+        playSound("explode");
         scoreRef.current += gained;
         setScore(scoreRef.current);
         setBest((b) => Math.max(b, scoreRef.current));
@@ -223,6 +233,7 @@ export default function SpaceInvadersGame() {
         }
       }
       if (hit || reached) {
+        playSound("lose");
         setPhase("over");
         return;
       }
@@ -234,7 +245,7 @@ export default function SpaceInvadersGame() {
       force((n) => (n + 1) & 0xffff);
     }, TICK_MS);
     return () => window.clearInterval(id);
-  }, [phase, nextWave]);
+  }, [phase, nextWave, fire]);
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -307,16 +318,17 @@ export default function SpaceInvadersGame() {
   }, [fire]);
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <button
           type="button"
           onPointerDown={onBoardPointerDown}
           onPointerMove={onBoardPointerMove}
           onPointerUp={onBoardPointerUp}
           onPointerCancel={() => (touchRef.current = null)}
-          className="relative overflow-hidden border border-line select-none touch-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none", background: "#020617" }}
+          className="relative h-full w-full overflow-hidden border border-line select-none touch-none"
+          style={{ touchAction: "none", background: "#020617" }}
           aria-label="Space Invaders"
         >
           {aliens.current.map((a) => {
@@ -355,10 +367,57 @@ export default function SpaceInvadersGame() {
               top: PLAYER_Y,
               width: PLAYER_W,
               height: PLAYER_H,
-              background: "#22d3ee",
             }}
             aria-hidden
-          />
+          >
+            {/* base / wings */}
+            <span
+              className="absolute"
+              style={{
+                left: 0,
+                bottom: 0,
+                width: PLAYER_W,
+                height: 5,
+                background: "#22d3ee",
+                borderRadius: "2px 2px 1px 1px",
+              }}
+            />
+            {/* mid body */}
+            <span
+              className="absolute"
+              style={{
+                left: 6,
+                bottom: 4,
+                width: PLAYER_W - 12,
+                height: 5,
+                background: "#22d3ee",
+                borderRadius: "3px 3px 0 0",
+              }}
+            />
+            {/* cockpit dome */}
+            <span
+              className="absolute"
+              style={{
+                left: PLAYER_W / 2 - 5,
+                bottom: 8,
+                width: 10,
+                height: 4,
+                background: "#67e8f9",
+                borderRadius: "5px 5px 0 0",
+              }}
+            />
+            {/* cannon barrel */}
+            <span
+              className="absolute"
+              style={{
+                left: PLAYER_W / 2 - 1,
+                top: 0,
+                width: 2,
+                height: 5,
+                background: "#22d3ee",
+              }}
+            />
+          </span>
           <span
             className="absolute left-0 right-0"
             style={{ top: PLAYER_Y - 8, height: 1, background: "#22d3ee", opacity: 0.4 }}
@@ -372,13 +431,14 @@ export default function SpaceInvadersGame() {
               <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
                 {phase === "over"
                   ? "Space or click to retry"
-                  : "← → move · space to fire"}
+                  : "← → to move · auto-fires"}
               </span>
             </span>
           )}
         </button>
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          ← → or A/D · space to fire · drag to move, tap to fire
+        </ResponsivePlayfield>
+        <p className="max-w-full font-mono text-xs uppercase tracking-[0.2em] text-muted">
+          ← → or A/D · drag to move · auto-fires
         </p>
       </div>
 

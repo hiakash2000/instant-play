@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const WIDTH = 360;
 const HEIGHT = 560;
@@ -89,6 +91,7 @@ export default function BallFallGame() {
       }
 
       if (dead) {
+        playSound("lose");
         setPhase("over");
         return;
       }
@@ -101,6 +104,7 @@ export default function BallFallGame() {
         }
       }
       if (scoredThisTick > 0) {
+        playSound("collect");
         scoreRef.current += scoredThisTick;
         setScore(scoreRef.current);
         setBest((b) => Math.max(b, scoreRef.current));
@@ -168,12 +172,12 @@ export default function BallFallGame() {
   }
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <div
-          className="relative overflow-hidden border border-line bg-surface select-none touch-none"
-          style={{ width: WIDTH, height: HEIGHT }}
-          onPointerDown={onPointerDown}
+          className="relative h-full w-full overflow-hidden border border-line bg-surface select-none touch-none"
+                    onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
@@ -245,6 +249,7 @@ export default function BallFallGame() {
             </span>
           )}
         </div>
+        </ResponsivePlayfield>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           ← → or A/D · drag the board · space to start
         </p>

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const WIDTH = 360;
 const HEIGHT = 560;
@@ -131,6 +133,7 @@ export default function JumpUpGame() {
           if (prevBottom <= p.y && nextBottom >= p.y) {
             charY.current = p.y - CHAR_H;
             charV.current = BOUNCE_V;
+            playSound("jump");
             break;
           }
         }
@@ -161,6 +164,7 @@ export default function JumpUpGame() {
       planks.current = planks.current.filter((p) => p.y < dropLimit);
 
       if (charY.current > highestY.current + (HEIGHT - DISPLAY_CHAR_Y)) {
+        playSound("lose");
         setPhase("over");
         return;
       }
@@ -233,8 +237,9 @@ export default function JumpUpGame() {
   const charScreenY = charY.current - viewY;
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <button
           type="button"
           onPointerDown={onBoardPointerDown}
@@ -242,8 +247,8 @@ export default function JumpUpGame() {
           onPointerUp={endTouch}
           onPointerCancel={endTouch}
           onPointerLeave={endTouch}
-          className="relative overflow-hidden border border-line bg-surface select-none touch-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
+          className="relative h-full w-full overflow-hidden border border-line bg-surface select-none touch-none"
+          style={{ touchAction: "none" }}
           aria-label="Jump"
         >
           {planks.current.map((p, i) => {
@@ -273,10 +278,85 @@ export default function JumpUpGame() {
               top: charScreenY,
               width: CHAR_W,
               height: CHAR_H,
-              background: "#facc15",
             }}
             aria-hidden
-          />
+          >
+            {/* body */}
+            <span
+              className="absolute"
+              style={{
+                left: 2,
+                bottom: 0,
+                width: CHAR_W - 4,
+                height: CHAR_H - 6,
+                background: "#22c55e",
+                borderRadius: "9px 9px 9px 9px",
+                boxShadow: "inset 0 -3px 0 rgba(0,0,0,0.25)",
+              }}
+            />
+            {/* belly */}
+            <span
+              className="absolute"
+              style={{
+                left: 6,
+                bottom: 1,
+                width: CHAR_W - 12,
+                height: CHAR_H - 14,
+                background: "#bbf7d0",
+                borderRadius: "5px 5px 6px 6px",
+              }}
+            />
+            {/* left eye */}
+            <span
+              className="absolute"
+              style={{
+                left: 1,
+                top: 0,
+                width: 8,
+                height: 8,
+                background: "#ffffff",
+                borderRadius: "50%",
+                border: "1px solid #166534",
+              }}
+            />
+            {/* right eye */}
+            <span
+              className="absolute"
+              style={{
+                right: 1,
+                top: 0,
+                width: 8,
+                height: 8,
+                background: "#ffffff",
+                borderRadius: "50%",
+                border: "1px solid #166534",
+              }}
+            />
+            {/* left pupil */}
+            <span
+              className="absolute"
+              style={{
+                left: 4,
+                top: 3,
+                width: 3,
+                height: 3,
+                background: "#0f172a",
+                borderRadius: "50%",
+              }}
+            />
+            {/* right pupil */}
+            <span
+              className="absolute"
+              style={{
+                right: 4,
+                top: 3,
+                width: 3,
+                height: 3,
+                background: "#0f172a",
+                borderRadius: "50%",
+              }}
+            />
+          </span>
           {phase !== "playing" && (
             <span className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 text-center">
               <span className="font-serif text-3xl tracking-tight">
@@ -290,6 +370,7 @@ export default function JumpUpGame() {
             </span>
           )}
         </button>
+        </ResponsivePlayfield>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           ← → or A/D · tap & hold left/right half on touch · screen wraps at the edges
         </p>

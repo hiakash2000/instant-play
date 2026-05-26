@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const WIDTH = 520;
 const HEIGHT = 360;
@@ -114,6 +116,7 @@ export default function TennisGame() {
           (b.y - (playerY.current + PADDLE_H / 2)) / (PADDLE_H / 2);
         b.vx = speed.current;
         b.vy = offset * speed.current * 0.9;
+        playSound("hit");
       }
 
       if (
@@ -128,12 +131,15 @@ export default function TennisGame() {
         const offset = (b.y - (aiY.current + PADDLE_H / 2)) / (PADDLE_H / 2);
         b.vx = -speed.current;
         b.vy = offset * speed.current * 0.9;
+        playSound("hit");
       }
 
       if (b.x < -BALL_R * 2) {
+        playSound("lose");
         setScoreA((s) => s + 1);
         serve("ai");
       } else if (b.x > WIDTH + BALL_R * 2) {
+        playSound("score");
         scorePRef.current += 1;
         setScoreP(scorePRef.current);
         setBest((bb) => Math.max(bb, scorePRef.current));
@@ -206,16 +212,17 @@ export default function TennisGame() {
   }, []);
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <button
           type="button"
           onPointerDown={onBoardPointerDown}
           onPointerMove={onBoardPointerMove}
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
-          className="relative overflow-hidden border border-line select-none touch-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none", background: "#15803d" }}
+          className="relative h-full w-full overflow-hidden border border-line select-none touch-none"
+          style={{ touchAction: "none", background: "#15803d" }}
           aria-label="Tennis"
         >
           {Array.from({ length: 16 }).map((_, i) => (
@@ -269,6 +276,7 @@ export default function TennisGame() {
             </span>
           )}
         </button>
+        </ResponsivePlayfield>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           ↑ ↓ or W/S · drag vertically · space resets the score
         </p>

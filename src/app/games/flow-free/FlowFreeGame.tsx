@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 type Cell = [number, number];
 type Endpoint = { color: string; pos: Cell };
@@ -169,12 +171,16 @@ export default function FlowFreeGame() {
     return covered === level.size * level.size;
   }, [paths, level]);
 
+  useEffect(() => {
+    if (allConnected) playSound("win");
+  }, [allConnected]);
+
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={level.size * CELL} height={level.size * CELL}>
         <div
-          className="relative border border-line bg-surface select-none"
-          style={{ width: level.size * CELL, height: level.size * CELL }}
+          className="relative h-full w-full border border-line bg-surface select-none"
           onPointerUp={endDrag}
           onPointerLeave={endDrag}
         >
@@ -225,6 +231,7 @@ export default function FlowFreeGame() {
             </span>
           )}
         </div>
+        </ResponsivePlayfield>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           Drag from one dot to its match · drag back to undo
         </p>
@@ -253,14 +260,14 @@ export default function FlowFreeGame() {
           <button
             type="button"
             onClick={() => setPaths({})}
-            className="flex-1 border border-line px-4 py-3 text-sm hover:bg-surface-hover"
+            className="flex-1 border border-line px-4 py-3 text-sm text-accent hover:bg-surface-hover"
           >
             Reset
           </button>
           <button
             type="button"
             onClick={() => setLevelIdx((i) => (i + 1) % LEVELS.length)}
-            className="flex-1 border border-line px-4 py-3 text-sm hover:bg-surface-hover"
+            className="flex-1 border border-line px-4 py-3 text-sm text-accent hover:bg-surface-hover"
           >
             Skip
           </button>

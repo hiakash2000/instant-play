@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const WIDTH = 360;
 const HEIGHT = 560;
@@ -89,6 +91,7 @@ export default function SubwaySurfersGame() {
       }
 
       if (dead) {
+        playSound("crash");
         setPhase("over");
         setBest((b) => Math.max(b, Math.floor(distRef.current / 10)));
       } else {
@@ -118,7 +121,7 @@ export default function SubwaySurfersGame() {
         force((n) => (n + 1) & 0xffff);
       } else if (e.key === "ArrowUp" || e.key === " ") {
         e.preventDefault();
-        if (jumpRef.current === 0) jumpRef.current = 28;
+        if (jumpRef.current === 0) { jumpRef.current = 28; playSound("jump"); }
       }
     }
     window.addEventListener("keydown", onKey);
@@ -153,7 +156,7 @@ export default function SubwaySurfersGame() {
             ? Math.min(LANES - 1, laneRef.current + 1)
             : Math.max(0, laneRef.current - 1);
       } else if (dy < 0) {
-        if (jumpRef.current === 0) jumpRef.current = 28;
+        if (jumpRef.current === 0) { jumpRef.current = 28; playSound("jump"); }
       }
       force((n) => (n + 1) & 0xffff);
     },
@@ -161,14 +164,15 @@ export default function SubwaySurfersGame() {
   );
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <div
           onPointerDown={onBoardPointerDown}
           onPointerUp={onBoardPointerUp}
           onPointerCancel={() => (touchStartRef.current = null)}
-          className="relative overflow-hidden border border-line touch-none select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none", background: "linear-gradient(to bottom, #1f2937, #374151)" }}
+          className="relative h-full w-full overflow-hidden border border-line touch-none select-none"
+          style={{ touchAction: "none", background: "linear-gradient(to bottom, #1f2937, #374151)" }}
         >
           {[1, 2].map((i) => (
             <span
@@ -202,9 +206,49 @@ export default function SubwaySurfersGame() {
               width: PLAYER_W,
               height: PLAYER_H,
               transform: jumpRef.current > 0 ? `translateY(-30px) scale(0.85)` : "none",
-              background: "#ec4899",
             }}
-          />
+          >
+            {/* body */}
+            <span
+              className="absolute"
+              style={{
+                inset: 0,
+                background: "#ec4899",
+                borderRadius: 4,
+                boxShadow: "inset 0 -3px 0 rgba(0,0,0,0.25)",
+              }}
+            />
+            {/* windshield (front) */}
+            <span
+              className="absolute"
+              style={{
+                left: 4,
+                top: 5,
+                width: PLAYER_W - 8,
+                height: 9,
+                background: "rgba(15,23,42,0.7)",
+                borderRadius: 2,
+              }}
+            />
+            {/* front wheels */}
+            <span
+              className="absolute"
+              style={{ left: -1, top: 4, width: 3, height: 10, background: "#0f172a", borderRadius: 1 }}
+            />
+            <span
+              className="absolute"
+              style={{ left: PLAYER_W - 2, top: 4, width: 3, height: 10, background: "#0f172a", borderRadius: 1 }}
+            />
+            {/* rear wheels */}
+            <span
+              className="absolute"
+              style={{ left: -1, top: PLAYER_H - 14, width: 3, height: 10, background: "#0f172a", borderRadius: 1 }}
+            />
+            <span
+              className="absolute"
+              style={{ left: PLAYER_W - 2, top: PLAYER_H - 14, width: 3, height: 10, background: "#0f172a", borderRadius: 1 }}
+            />
+          </span>
           {phase !== "playing" && (
             <span className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 text-center">
               <span className="font-serif text-3xl tracking-tight">
@@ -216,6 +260,7 @@ export default function SubwaySurfersGame() {
             </span>
           )}
         </div>
+        </ResponsivePlayfield>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           ← → swap lanes · ↑/space to jump · or swipe left/right/up
         </p>

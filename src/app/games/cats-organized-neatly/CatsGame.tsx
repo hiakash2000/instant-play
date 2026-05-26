@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 type Cell = { dx: number; dy: number };
 type Piece = { id: number; cells: Cell[] };
@@ -100,6 +102,7 @@ export default function CatsGame() {
 
   useEffect(() => {
     if (pieces.length > 0 && Object.keys(placed).length === pieces.length) {
+      playSound("win");
       setPhase("won");
     }
   }, [placed, pieces]);
@@ -185,7 +188,7 @@ export default function CatsGame() {
   }
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div
         ref={containerRef}
         className="relative flex flex-col gap-4 select-none touch-none"
@@ -193,10 +196,10 @@ export default function CatsGame() {
         onPointerUp={onPointerUp}
         onPointerCancel={() => setDrag(null)}
       >
+        <ResponsivePlayfield width={size * CELL} height={size * CELL}>
         <div
           ref={boardRef}
-          className="relative border border-line bg-surface"
-          style={{ width: size * CELL, height: size * CELL }}
+          className="relative h-full w-full border border-line bg-surface"
         >
           {Array.from({ length: size }).map((_, y) =>
             Array.from({ length: size }).map((_, x) => (
@@ -291,6 +294,7 @@ export default function CatsGame() {
             </span>
           )}
         </div>
+        </ResponsivePlayfield>
 
         <div className="relative flex min-h-[120px] flex-wrap gap-3 border border-line bg-surface p-3">
           {trayPieces.length === 0 && (

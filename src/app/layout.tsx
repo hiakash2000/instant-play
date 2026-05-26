@@ -6,6 +6,7 @@ import "./globals.css";
 import ThemeToggle from "./ThemeToggle";
 import AboutMe from "./AboutMe";
 import MobileMenu from "./MobileMenu";
+import MuteToggle from "./MuteToggle";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -61,6 +62,7 @@ export default async function RootLayout({
                 All games
               </Link>
               <AboutMe />
+              <MuteToggle />
               <ThemeToggle />
             </div>
             <MobileMenu />

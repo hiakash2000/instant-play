@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { playSound } from "../sound";
 
 type Cell = "X" | "O" | null;
 
@@ -62,6 +63,11 @@ export default function TicTacToeBoard() {
 
   const { winner, line } = evaluate(cells);
   const isDraw = !winner && cells.every(Boolean);
+
+  useEffect(() => {
+    if (winner === "X") playSound("win");
+    else if (winner === "O") playSound("lose");
+  }, [winner]);
   const status: string = winner
     ? winner === "X"
       ? "You win"
@@ -89,6 +95,7 @@ export default function TicTacToeBoard() {
     if (cells[i] || winner || turn !== "X") return;
     const next = cells.slice();
     next[i] = "X";
+    playSound("click");
     setCells(next);
     setTurn("O");
   }
@@ -99,7 +106,7 @@ export default function TicTacToeBoard() {
   }
 
   return (
-    <div className="flex flex-col items-start gap-8">
+    <div className="flex flex-col items-center gap-8 px-4 sm:items-start sm:px-0">
       <div
         className="font-mono text-xs uppercase tracking-[0.2em] text-muted"
         aria-live="polite"

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const COLS = 10;
 const ROWS = 20;
@@ -201,6 +203,7 @@ export default function TetrisGame() {
     const { board: nb, cleared } = clearLines(board.current);
     board.current = nb;
     if (cleared > 0) {
+      playSound("score");
       scoreRef.current += LINE_POINTS[cleared] * levelRef.current;
       linesRef.current += cleared;
       levelRef.current = 1 + Math.floor(linesRef.current / 10);
@@ -211,6 +214,7 @@ export default function TetrisGame() {
     }
     piece.current = makePiece();
     if (!canPlace(board.current, piece.current)) {
+      playSound("lose");
       setPhase("over");
     }
   }, []);
@@ -366,15 +370,16 @@ export default function TetrisGame() {
   }
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <div
           onPointerDown={onBoardPointerDown}
           onPointerMove={onBoardPointerMove}
           onPointerUp={onBoardPointerUp}
           onPointerCancel={() => (touchRef.current = null)}
-          className="relative overflow-hidden border border-line select-none touch-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none", background: "#0f172a" }}
+          className="relative h-full w-full overflow-hidden border border-line select-none touch-none"
+          style={{ touchAction: "none", background: "#0f172a" }}
         >
           {display.map((row, r) =>
             row.map((cell, c) => (
@@ -402,6 +407,7 @@ export default function TetrisGame() {
             </span>
           )}
         </div>
+        </ResponsivePlayfield>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           ← → move · ↓ soft drop · ↑ rotate · space hard drop · drag/tap on touch
         </p>

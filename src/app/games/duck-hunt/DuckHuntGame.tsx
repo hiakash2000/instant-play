@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const WIDTH = 640;
 const HEIGHT = 400;
@@ -77,6 +79,7 @@ export default function DuckHuntGame() {
       const left = Math.max(0, roundEndsAt.current - now);
       setTimeLeft(left);
       if (left <= 0) {
+        playSound("lose");
         setPhase("over");
         setBest((b) => Math.max(b, score));
         return;
@@ -136,6 +139,7 @@ export default function DuckHuntGame() {
       const x = (e.clientX - rect.left) * sx;
       const y = (e.clientY - rect.top) * sy;
       const d = duck.current;
+      playSound("shoot");
       if (d && d.state === "flying") {
         if (
           x >= d.x &&
@@ -144,6 +148,7 @@ export default function DuckHuntGame() {
           y <= d.y + DUCK_H
         ) {
           d.state = "dead";
+          playSound("hit");
           setScore((s) => s + 1);
           return;
         }
@@ -162,13 +167,14 @@ export default function DuckHuntGame() {
   const seconds = Math.ceil(timeLeft / 1000);
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <button
           type="button"
           onPointerDown={onBoardClick}
-          className="relative overflow-hidden border border-line touch-manipulation select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", cursor: "crosshair", touchAction: "manipulation", background: "linear-gradient(to bottom, #93c5fd, #bfdbfe)" }}
+          className="relative h-full w-full overflow-hidden border border-line touch-manipulation select-none"
+          style={{ cursor: "crosshair", touchAction: "manipulation", background: "linear-gradient(to bottom, #93c5fd, #bfdbfe)" }}
           aria-label="Shoot"
         >
           {/* Bush along the bottom */}
@@ -201,12 +207,54 @@ export default function DuckHuntGame() {
                 top: d.y,
                 width: DUCK_W,
                 height: DUCK_H,
-                transform: d.state === "dead" ? "rotate(20deg)" : undefined,
-                background: "#7c2d12",
-                borderTop: `4px solid #f97316`,
+                transform: `${d.vx < 0 ? "scaleX(-1)" : ""} ${d.state === "dead" ? "rotate(20deg)" : ""}`.trim() || undefined,
                 opacity: d.state === "dead" ? 0.6 : 1,
               }}
-            />
+            >
+              {/* tail */}
+              <span
+                className="absolute"
+                style={{ left: 0, top: 9, width: 5, height: 5, background: "#7c2d12", borderRadius: "2px 0 0 2px" }}
+              />
+              {/* body */}
+              <span
+                className="absolute"
+                style={{
+                  left: 4,
+                  top: 6,
+                  width: 22,
+                  height: 16,
+                  background: "#7c2d12",
+                  borderRadius: "10px 12px 10px 10px",
+                  boxShadow: "inset 0 -3px 0 rgba(0,0,0,0.2)",
+                }}
+              />
+              {/* wing */}
+              <span
+                className="absolute"
+                style={{ left: 10, top: 9, width: 12, height: 8, background: "#451a03", borderRadius: "6px 8px 8px 4px" }}
+              />
+              {/* head */}
+              <span
+                className="absolute"
+                style={{ left: 22, top: 1, width: 12, height: 12, background: "#7c2d12", borderRadius: "50%" }}
+              />
+              {/* beak */}
+              <span
+                className="absolute"
+                style={{ left: 30, top: 7, width: 6, height: 4, background: "#f97316", borderRadius: "1px 3px 3px 1px" }}
+              />
+              {/* eye (white) */}
+              <span
+                className="absolute"
+                style={{ left: 26, top: 4, width: 3, height: 3, background: "#ffffff", borderRadius: "50%" }}
+              />
+              {/* eye (pupil) */}
+              <span
+                className="absolute"
+                style={{ left: 27, top: 5, width: 1, height: 1, background: "#0f172a", borderRadius: "50%" }}
+              />
+            </span>
           )}
 
           {phase !== "playing" && (
@@ -224,6 +272,7 @@ export default function DuckHuntGame() {
             </span>
           )}
         </button>
+        </ResponsivePlayfield>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           Aim and click · ducks duck into the bush
         </p>
@@ -255,7 +304,7 @@ export default function DuckHuntGame() {
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
             Best
           </p>
-          <p className="mt-3 font-serif text-4xl">{best}</p>
+          <p className="mt-3 font-serif text-4xl text-accent">{best}</p>
         </div>
 
         <div className="flex flex-col gap-2 border border-line p-6 text-sm text-muted">

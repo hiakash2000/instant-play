@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const WIDTH = 320;
 const HEIGHT = 540;
@@ -110,6 +112,7 @@ export default function RoadFighterGame() {
       }
 
       if (dead) {
+        playSound("crash");
         setPhase("over");
         return;
       }
@@ -195,16 +198,17 @@ export default function RoadFighterGame() {
   }
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <button
           type="button"
           onPointerDown={onBoardPointerDown}
           onPointerMove={onBoardPointerMove}
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
-          className="relative overflow-hidden border border-line select-none touch-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none", background: "#16a34a" }}
+          className="relative h-full w-full overflow-hidden border border-line select-none touch-none"
+          style={{ touchAction: "none", background: "#16a34a" }}
           aria-label="Drive"
         >
           <span
@@ -236,24 +240,10 @@ export default function RoadFighterGame() {
             const OPP_COLORS = ["#3b82f6", "#a78bfa", "#22d3ee"];
             const oppColor = OPP_COLORS[i % OPP_COLORS.length];
             return (
-              <span
-                key={i}
-                className="absolute"
-                style={{ left: e.x, top: e.y, width: CAR_W, height: CAR_H, background: oppColor }}
-              />
+              <Vehicle key={i} x={e.x} y={e.y} color={oppColor} facing="down" />
             );
           })}
-          <span
-            className="absolute"
-            style={{
-              left: playerX.current,
-              top: PLAYER_Y,
-              width: CAR_W,
-              height: CAR_H,
-              background: "#ef4444",
-            }}
-            aria-hidden
-          />
+          <Vehicle x={playerX.current} y={PLAYER_Y} color="#ef4444" facing="up" />
           {phase !== "playing" && (
             <span className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 text-center">
               <span className="font-serif text-3xl tracking-tight">
@@ -267,6 +257,7 @@ export default function RoadFighterGame() {
             </span>
           )}
         </button>
+        </ResponsivePlayfield>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           ← → or A/D · drag on board · don&apos;t hit anyone
         </p>
@@ -299,5 +290,96 @@ export default function RoadFighterGame() {
         </div>
       </div>
     </div>
+  );
+}
+
+function Vehicle({
+  x,
+  y,
+  color,
+  facing,
+}: {
+  x: number;
+  y: number;
+  color: string;
+  facing: "up" | "down";
+}) {
+  const windshieldTop = facing === "up" ? 6 : CAR_H - 14;
+  const wheelTopFront = facing === "up" ? 4 : CAR_H - 14;
+  const wheelTopBack = facing === "up" ? CAR_H - 14 : 4;
+  return (
+    <>
+      {/* Body */}
+      <span
+        className="absolute"
+        style={{
+          left: x,
+          top: y,
+          width: CAR_W,
+          height: CAR_H,
+          background: color,
+          borderRadius: 4,
+          boxShadow: "inset 0 -3px 0 rgba(0,0,0,0.25)",
+        }}
+      />
+      {/* Windshield */}
+      <span
+        className="pointer-events-none absolute"
+        style={{
+          left: x + 4,
+          top: y + windshieldTop,
+          width: CAR_W - 8,
+          height: 8,
+          background: "rgba(15,23,42,0.7)",
+          borderRadius: 2,
+        }}
+      />
+      {/* Front wheels */}
+      <span
+        className="pointer-events-none absolute"
+        style={{
+          left: x - 1,
+          top: y + wheelTopFront,
+          width: 3,
+          height: 10,
+          background: "#0f172a",
+          borderRadius: 1,
+        }}
+      />
+      <span
+        className="pointer-events-none absolute"
+        style={{
+          left: x + CAR_W - 2,
+          top: y + wheelTopFront,
+          width: 3,
+          height: 10,
+          background: "#0f172a",
+          borderRadius: 1,
+        }}
+      />
+      {/* Rear wheels */}
+      <span
+        className="pointer-events-none absolute"
+        style={{
+          left: x - 1,
+          top: y + wheelTopBack,
+          width: 3,
+          height: 10,
+          background: "#0f172a",
+          borderRadius: 1,
+        }}
+      />
+      <span
+        className="pointer-events-none absolute"
+        style={{
+          left: x + CAR_W - 2,
+          top: y + wheelTopBack,
+          width: 3,
+          height: 10,
+          background: "#0f172a",
+          borderRadius: 1,
+        }}
+      />
+    </>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const WIDTH = 480;
 const HEIGHT = 480;
@@ -84,6 +86,7 @@ export default function DriftBossGame() {
 
       const aheadTile = tilesRef.current[carIndexRef.current + 1];
       if (!aheadTile || aheadTile.gx !== next.gx || aheadTile.gy !== next.gy) {
+        playSound("crash");
         setPhase("over");
         return;
       }
@@ -129,16 +132,17 @@ export default function DriftBossGame() {
   const camOffset = offsetRef.current;
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <button
           type="button"
           onPointerDown={(e) => {
             e.preventDefault();
             flip();
           }}
-          className="relative overflow-hidden border border-line touch-manipulation select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation", background: "#0c4a6e" }}
+          className="relative h-full w-full overflow-hidden border border-line touch-manipulation select-none"
+          style={{ touchAction: "manipulation", background: "#0c4a6e" }}
           aria-label="Flip"
         >
           {tilesRef.current.map((t, i) => {
@@ -168,10 +172,53 @@ export default function DriftBossGame() {
               top: carRef.current.gy * TILE - camOffset.y + 14,
               width: TILE - 30,
               height: TILE - 30,
-              background: "#ec4899",
+              transform:
+                carRef.current.dir === "right" ? "rotate(90deg)" : "none",
+              transformOrigin: "center center",
             }}
             aria-hidden
-          />
+          >
+            {/* body */}
+            <span
+              className="absolute"
+              style={{
+                inset: 0,
+                background: "#ec4899",
+                borderRadius: 4,
+                boxShadow: "inset 0 -2px 0 rgba(0,0,0,0.25)",
+              }}
+            />
+            {/* windshield (front) */}
+            <span
+              className="absolute"
+              style={{
+                left: 5,
+                top: 4,
+                width: TILE - 30 - 10,
+                height: 7,
+                background: "rgba(15,23,42,0.75)",
+                borderRadius: 2,
+              }}
+            />
+            {/* front wheels */}
+            <span
+              className="absolute"
+              style={{ left: -1, top: 3, width: 2, height: 7, background: "#0f172a", borderRadius: 1 }}
+            />
+            <span
+              className="absolute"
+              style={{ left: TILE - 30 - 1, top: 3, width: 2, height: 7, background: "#0f172a", borderRadius: 1 }}
+            />
+            {/* rear wheels */}
+            <span
+              className="absolute"
+              style={{ left: -1, top: TILE - 30 - 10, width: 2, height: 7, background: "#0f172a", borderRadius: 1 }}
+            />
+            <span
+              className="absolute"
+              style={{ left: TILE - 30 - 1, top: TILE - 30 - 10, width: 2, height: 7, background: "#0f172a", borderRadius: 1 }}
+            />
+          </span>
           {phase !== "playing" && (
             <span className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 text-center">
               <span className="font-serif text-3xl tracking-tight">
@@ -183,6 +230,7 @@ export default function DriftBossGame() {
             </span>
           )}
         </button>
+        </ResponsivePlayfield>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           Click the board or press space to flip steering
         </p>

@@ -222,8 +222,7 @@ export default function MobileFullscreen({
         const rightCol = outer.children[1] as HTMLElement | undefined;
         if (rightCol) {
           sideSnapsRef.current.push(snapshot(rightCol));
-          (rightCol.style as CSSStyleDeclaration & { zoom?: string }).zoom =
-            "0.55";
+          rightCol.style.maxWidth = "260px";
         }
       }
     }

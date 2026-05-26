@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const WIDTH = 560;
 const HEIGHT = 400;
@@ -179,22 +181,28 @@ export default function VampireSurvivorsGame() {
       bulletsRef.current = bulletsRef.current.filter((b) => b.x > -10);
 
       // Remove dead enemies, drop gems.
+      let killed = 0;
       enemiesRef.current = enemiesRef.current.filter((e) => {
         if (e.hp <= 0) {
           gemsRef.current.push({ x: e.x, y: e.y });
+          killed += 1;
           return false;
         }
         return true;
       });
+      if (killed > 0) playSound("hit");
 
       // Gem pickup.
+      let picked = 0;
       gemsRef.current = gemsRef.current.filter((g) => {
         if (Math.hypot(g.x - p.x, g.y - p.y) < 22) {
           xpRef.current += 1;
+          picked += 1;
           return false;
         }
         return true;
       });
+      if (picked > 0) playSound("collect");
 
       // Level up.
       if (xpRef.current >= xpNeedRef.current) {
@@ -208,6 +216,7 @@ export default function VampireSurvivorsGame() {
       }
 
       if (hpRef.current <= 0) {
+        playSound("lose");
         setBest((b) => Math.max(b, Math.floor(timeRef.current / 1000)));
         setPhase("over");
       } else {
@@ -282,25 +291,56 @@ export default function VampireSurvivorsGame() {
   };
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <div
           onPointerDown={onBoardPointerDown}
           onPointerMove={onBoardPointerMove}
           onPointerUp={endTouch}
           onPointerCancel={endTouch}
           onPointerLeave={endTouch}
-          className="relative overflow-hidden border border-line select-none touch-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none", background: "#1e1b4b" }}
+          className="relative h-full w-full overflow-hidden border border-line select-none touch-none"
+          style={{ touchAction: "none", background: "#1e1b4b" }}
         >
           {enemiesRef.current.map((e, i) => {
             const ENEMY_COLORS = ["#ef4444", "#a855f7", "#f472b6"];
+            const bodyColor = ENEMY_COLORS[i % ENEMY_COLORS.length];
             return (
               <span
                 key={`e${i}`}
                 className="absolute"
-                style={{ left: e.x - 7, top: e.y - 7, width: 14, height: 14, background: ENEMY_COLORS[i % ENEMY_COLORS.length] }}
-              />
+                style={{ left: e.x - 7, top: e.y - 7, width: 14, height: 14 }}
+              >
+                {/* outstretched arms */}
+                <span
+                  className="absolute"
+                  style={{ left: -2, top: 6, width: 5, height: 2, background: bodyColor, borderRadius: 1 }}
+                />
+                <span
+                  className="absolute"
+                  style={{ right: -2, top: 6, width: 5, height: 2, background: bodyColor, borderRadius: 1 }}
+                />
+                {/* body */}
+                <span
+                  className="absolute"
+                  style={{ left: 3, top: 5, width: 8, height: 8, background: bodyColor, borderRadius: "2px 2px 3px 3px" }}
+                />
+                {/* pale undead head */}
+                <span
+                  className="absolute"
+                  style={{ left: 4, top: 0, width: 6, height: 6, background: "#9ca3af", borderRadius: "50%" }}
+                />
+                {/* glowing eyes */}
+                <span
+                  className="absolute"
+                  style={{ left: 5, top: 2, width: 1, height: 1, background: "#0f172a" }}
+                />
+                <span
+                  className="absolute"
+                  style={{ right: 5, top: 2, width: 1, height: 1, background: "#0f172a" }}
+                />
+              </span>
             );
           })}
           {gemsRef.current.map((g, i) => (
@@ -324,10 +364,53 @@ export default function VampireSurvivorsGame() {
               top: playerRef.current.y - 9,
               width: 18,
               height: 18,
-              background: "#facc15",
-              boxShadow: "0 0 12px rgba(250,204,21,0.7)",
+              filter: "drop-shadow(0 0 6px rgba(250,204,21,0.7))",
             }}
-          />
+          >
+            {/* torso */}
+            <span
+              className="absolute"
+              style={{
+                left: 3,
+                top: 8,
+                width: 12,
+                height: 10,
+                background: "#2563eb",
+                borderRadius: "3px 3px 4px 4px",
+              }}
+            />
+            {/* arms */}
+            <span
+              className="absolute"
+              style={{ left: 0, top: 9, width: 3, height: 6, background: "#fcd34d", borderRadius: 1 }}
+            />
+            <span
+              className="absolute"
+              style={{ right: 0, top: 9, width: 3, height: 6, background: "#fcd34d", borderRadius: 1 }}
+            />
+            {/* head */}
+            <span
+              className="absolute"
+              style={{
+                left: 4,
+                top: 0,
+                width: 10,
+                height: 10,
+                background: "#fcd34d",
+                borderRadius: "50%",
+                border: "1px solid #b45309",
+              }}
+            />
+            {/* eyes */}
+            <span
+              className="absolute"
+              style={{ left: 6, top: 4, width: 1.5, height: 1.5, background: "#0f172a" }}
+            />
+            <span
+              className="absolute"
+              style={{ right: 6, top: 4, width: 1.5, height: 1.5, background: "#0f172a" }}
+            />
+          </span>
 
           {/* HP bar */}
           <span className="absolute left-3 top-3 h-2 w-40 bg-line">
@@ -382,8 +465,11 @@ export default function VampireSurvivorsGame() {
             </span>
           )}
         </div>
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          WASD / arrows to move · or touch and hold to move toward your finger · weapon fires automatically
+        </ResponsivePlayfield>
+        <p className="max-w-[560px] font-mono text-xs uppercase tracking-[0.2em] text-muted">
+          WASD / arrows to move · or touch and hold to move toward your finger
+          <br />
+          Weapon fires automatically
         </p>
       </div>
 

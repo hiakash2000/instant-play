@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import { playSound } from "../sound";
 
 const COLS = 24;
 const ROWS = 18;
@@ -17,6 +18,26 @@ const DIR_VECTORS: Record<Dir, Point> = {
   down: { x: 0, y: 1 },
   left: { x: -1, y: 0 },
   right: { x: 1, y: 0 },
+};
+
+type EyeStyle = { width: string; height: string; top?: string; bottom?: string; left?: string; right?: string };
+const HEAD_EYES: Record<Dir, [EyeStyle, EyeStyle]> = {
+  right: [
+    { width: "22%", height: "22%", top: "18%", right: "18%" },
+    { width: "22%", height: "22%", bottom: "18%", right: "18%" },
+  ],
+  left: [
+    { width: "22%", height: "22%", top: "18%", left: "18%" },
+    { width: "22%", height: "22%", bottom: "18%", left: "18%" },
+  ],
+  up: [
+    { width: "22%", height: "22%", top: "18%", left: "18%" },
+    { width: "22%", height: "22%", top: "18%", right: "18%" },
+  ],
+  down: [
+    { width: "22%", height: "22%", bottom: "18%", left: "18%" },
+    { width: "22%", height: "22%", bottom: "18%", right: "18%" },
+  ],
 };
 
 const OPPOSITE: Record<Dir, Dir> = {
@@ -112,6 +133,7 @@ export default function SnakeGame() {
       const hitsSelf = body.some((p) => p.x === next.x && p.y === next.y);
 
       if (hitsWall || hitsSelf) {
+        playSound("lose");
         setPhase("over");
         setBest((b) => Math.max(b, score));
         return prev;
@@ -120,6 +142,7 @@ export default function SnakeGame() {
       const moved = [next, ...body];
 
       if (eats) {
+        playSound("collect");
         setScore((s) => {
           const ns = s + 1;
           setBest((b) => Math.max(b, ns));
@@ -226,7 +249,7 @@ export default function SnakeGame() {
   const foodKey = `${food.x},${food.y}`;
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
         <div
           onPointerDown={onBoardPointerDown}
@@ -249,19 +272,73 @@ export default function SnakeGame() {
               const isHead = key === headKey;
               const isBody = bodyKeys.has(key);
               const isFood = key === foodKey;
-              const bg = isHead
-                ? "#22c55e"
-                : isBody
-                  ? "rgba(34,197,94,0.6)"
-                  : isFood
-                    ? "#ef4444"
-                    : undefined;
+
+              if (isHead) {
+                const eyes = HEAD_EYES[dir];
+                return (
+                  <div
+                    key={i}
+                    className="relative border-[0.5px] border-line/30"
+                    style={{
+                      background: "#22c55e",
+                      borderRadius: "35%",
+                      boxShadow: "inset 0 -1px 0 rgba(0,0,0,0.25)",
+                    }}
+                  >
+                    <span
+                      className="absolute rounded-full bg-white"
+                      style={eyes[0]}
+                    />
+                    <span
+                      className="absolute rounded-full bg-white"
+                      style={eyes[1]}
+                    />
+                    <span
+                      className="absolute rounded-full bg-slate-900"
+                      style={{ ...eyes[0], width: "12%", height: "12%" }}
+                    />
+                    <span
+                      className="absolute rounded-full bg-slate-900"
+                      style={{ ...eyes[1], width: "12%", height: "12%" }}
+                    />
+                  </div>
+                );
+              }
+
+              if (isFood) {
+                return (
+                  <div
+                    key={i}
+                    className="relative flex items-center justify-center border-[0.5px] border-line/30"
+                  >
+                    <span
+                      className="block rounded-full"
+                      style={{
+                        width: "70%",
+                        height: "70%",
+                        background: "#ef4444",
+                        boxShadow: "inset -1px -1px 0 rgba(0,0,0,0.2)",
+                      }}
+                    />
+                  </div>
+                );
+              }
+
+              if (isBody) {
+                return (
+                  <div
+                    key={i}
+                    className="border-[0.5px] border-line/30"
+                    style={{
+                      background: "rgba(34,197,94,0.7)",
+                      borderRadius: "30%",
+                    }}
+                  />
+                );
+              }
+
               return (
-                <div
-                  key={i}
-                  className="border-[0.5px] border-line/30"
-                  style={{ background: bg }}
-                />
+                <div key={i} className="border-[0.5px] border-line/30" />
               );
             })}
           </div>

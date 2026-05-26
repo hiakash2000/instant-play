@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const WIDTH = 640;
 const HEIGHT = 280;
@@ -62,6 +64,7 @@ export default function GeometryDashGame() {
     if (onGroundRef.current) {
       vRef.current = JUMP_V;
       onGroundRef.current = false;
+      playSound("jump");
     }
   }, [reset]);
 
@@ -104,6 +107,7 @@ export default function GeometryDashGame() {
       }
 
       if (dead) {
+        playSound("crash");
         setPhase("over");
         setBest((b) => Math.max(b, Math.floor(distanceRef.current / 10)));
       } else {
@@ -126,16 +130,17 @@ export default function GeometryDashGame() {
   }, [jump]);
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <button
           type="button"
           onPointerDown={(e) => {
             e.preventDefault();
             jump();
           }}
-          className="relative overflow-hidden border border-line touch-manipulation select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation", background: "linear-gradient(to bottom, #1e1b4b, #312e81)" }}
+          className="relative h-full w-full overflow-hidden border border-line touch-manipulation select-none"
+          style={{ touchAction: "manipulation", background: "linear-gradient(to bottom, #1e1b4b, #312e81)" }}
           aria-label="Jump"
         >
           <span
@@ -177,6 +182,7 @@ export default function GeometryDashGame() {
             </span>
           )}
         </button>
+        </ResponsivePlayfield>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           Click the board or press space · ↑ also jumps
         </p>

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const WIDTH = 360;
 const HEIGHT = 560;
@@ -70,15 +72,18 @@ export default function FruitStabGame() {
             return d < tol;
           });
           if (hit) {
+            playSound("crash");
             setPhase("over");
             setBest((b) => Math.max(b, (level - 1) * 10 + thrown));
             return;
           }
+          playSound("hit");
           stuckRef.current.push(angle);
           flyingRef.current = null;
           setThrown((t) => {
             const nt = t + 1;
             if (nt >= cfg.target) {
+              playSound("win");
               setPhase("won");
               setBest((b) => Math.max(b, level * 10));
             }
@@ -127,16 +132,17 @@ export default function FruitStabGame() {
   }, [throwKnife]);
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <button
           type="button"
           onPointerDown={(e) => {
             e.preventDefault();
             throwKnife();
           }}
-          className="relative overflow-hidden border border-line bg-surface touch-manipulation select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation" }}
+          className="relative h-full w-full overflow-hidden border border-line bg-surface touch-manipulation select-none"
+          style={{ touchAction: "manipulation" }}
           aria-label="Throw"
         >
           <span
@@ -213,6 +219,7 @@ export default function FruitStabGame() {
             </span>
           )}
         </button>
+        </ResponsivePlayfield>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           Click the board or press space to throw
         </p>

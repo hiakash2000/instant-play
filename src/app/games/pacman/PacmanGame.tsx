@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const MAZE = [
   "###############",
@@ -203,6 +205,7 @@ export default function PacmanGame() {
         dots.current[p.y][p.x] = false;
         remainingRef.current -= 1;
         scoreRef.current += 10;
+        playSound("collect");
         setScore(scoreRef.current);
         setBest((b) => Math.max(b, scoreRef.current));
       }
@@ -224,6 +227,7 @@ export default function PacmanGame() {
       // Collision
       for (const g of ghosts.current) {
         if (g.x === p.x && g.y === p.y) {
+          playSound("lose");
           setPhase("over");
           return;
         }
@@ -304,15 +308,16 @@ export default function PacmanGame() {
   }, []);
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <button
           type="button"
           onPointerDown={onBoardPointerDown}
           onPointerUp={onBoardPointerUp}
           onPointerCancel={() => (touchStartRef.current = null)}
-          className="relative overflow-hidden border border-line select-none touch-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none", background: "#020617" }}
+          className="relative h-full w-full overflow-hidden border border-line select-none touch-none"
+          style={{ touchAction: "none", background: "#020617" }}
           aria-label="Pacman"
         >
           {wallCells.map((w) => (
@@ -385,6 +390,7 @@ export default function PacmanGame() {
             </span>
           )}
         </button>
+        </ResponsivePlayfield>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           Arrows, WASD, or swipe · turn at junctions · eat every dot
         </p>

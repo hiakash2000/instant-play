@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const WIDTH = 360;
 const HEIGHT = 560;
@@ -55,6 +57,7 @@ export default function FlappyDunkGame() {
       return;
     }
     ballRef.current.vy = TAP_V;
+    playSound("flap");
   }, [reset]);
 
   useEffect(() => {
@@ -88,6 +91,7 @@ export default function FlappyDunkGame() {
         b.x < h.x + (HOOP_W + HOOP_OPENING) / 2
       ) {
         h.passed = true;
+        playSound("score");
         setScore((s) => {
           const ns = s + 1;
           setBest((bb) => Math.max(bb, ns));
@@ -101,6 +105,7 @@ export default function FlappyDunkGame() {
       }
 
       if (b.y > HEIGHT + 40) {
+        playSound("lose");
         setPhase("over");
         return;
       }
@@ -124,16 +129,17 @@ export default function FlappyDunkGame() {
   const b = ballRef.current;
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <button
           type="button"
           onPointerDown={(e) => {
             e.preventDefault();
             tap();
           }}
-          className="relative overflow-hidden border border-line touch-manipulation select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation", background: "linear-gradient(to bottom, #fef3c7, #fde68a)" }}
+          className="relative h-full w-full overflow-hidden border border-line touch-manipulation select-none"
+          style={{ touchAction: "manipulation", background: "linear-gradient(to bottom, #fef3c7, #fde68a)" }}
           aria-label="Tap"
         >
           {/* hoop: two side bars and rim */}
@@ -171,6 +177,7 @@ export default function FlappyDunkGame() {
             </span>
           )}
         </button>
+        </ResponsivePlayfield>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           Click the board or press space to bounce
         </p>

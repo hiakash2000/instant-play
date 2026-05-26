@@ -269,12 +269,17 @@ export default function Home() {
         aria-label="Game categories"
         className="sticky top-0 z-30 border-b border-line bg-background/85 backdrop-blur"
       >
-        <ul className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-6 py-3 sm:px-10">
+        <ul className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-6 py-3 sm:px-10">
           {ordered.map((category) => (
-            <li key={category.name}>
+            <li
+              key={category.name}
+              style={
+                { ["--card-hue" as string]: category.hue } as React.CSSProperties
+              }
+            >
               <a
                 href={`#${slugify(category.name)}`}
-                className="inline-flex items-center gap-2 whitespace-nowrap border border-transparent px-4 py-2 font-mono text-xs uppercase tracking-[0.2em] text-muted transition-colors hover:border-line hover:text-foreground"
+                className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-line bg-surface/60 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.2em] text-muted transition-all hover:border-[color:var(--card-hue)] hover:text-[color:var(--card-hue)] hover:bg-[color-mix(in_oklab,var(--card-hue)_14%,transparent)]"
               >
                 <span
                   aria-hidden
@@ -313,41 +318,46 @@ export default function Home() {
             </span>
           </div>
 
-          <ul className="grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {category.games.map((game) => (
               <li
                 key={game.slug}
-                className="bg-background"
                 style={
                   { ["--card-hue" as string]: category.hue } as React.CSSProperties
                 }
               >
                 <Link
                   href={`/games/${game.slug}`}
-                  className="group flex h-full flex-col justify-between gap-10 p-8 transition-colors hover:bg-surface-hover sm:p-10"
+                  className="group relative flex h-full flex-col gap-5 overflow-hidden rounded-xl border border-line bg-surface p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[color:var(--card-hue)] hover:shadow-[0_10px_30px_-12px_var(--card-hue)]"
                 >
-                  <div className="flex h-32 items-center justify-center">
+                  <span
+                    aria-hidden
+                    className="absolute inset-x-0 top-0 h-0.5 opacity-70"
+                    style={{ background: category.hue }}
+                  />
+                  <div
+                    className="flex h-40 items-center justify-center rounded-lg border border-line/60"
+                    style={{
+                      background: `linear-gradient(135deg, ${category.hue}1f, transparent 65%)`,
+                    }}
+                  >
                     {game.preview}
                   </div>
-                  <div>
-                    <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+                  <div className="flex flex-1 flex-col">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted">
                       {game.players}
                     </p>
-                    <h3
-                      className="mt-3 font-serif text-3xl tracking-tight transition-colors group-hover:[color:var(--card-hue)]"
-                    >
+                    <h3 className="mt-2 font-serif text-2xl tracking-tight transition-colors group-hover:[color:var(--card-hue)]">
                       {game.title}
                     </h3>
-                    <p className="mt-3 text-sm leading-relaxed text-muted">
+                    <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">
                       {game.tagline}
                     </p>
-                    <span
-                      className="mt-6 inline-flex items-center gap-2 text-sm text-foreground transition-colors group-hover:[color:var(--card-hue)]"
-                    >
+                    <span className="mt-5 inline-flex w-fit items-center gap-1.5 rounded-full border border-[color:var(--card-hue)] px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-[color:var(--card-hue)] transition-all group-hover:bg-[var(--card-hue)] group-hover:text-background">
                       Play
                       <span
                         aria-hidden
-                        className="transition-transform group-hover:translate-x-1"
+                        className="transition-transform group-hover:translate-x-0.5"
                       >
                         →
                       </span>

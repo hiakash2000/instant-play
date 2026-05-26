@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const WIDTH = 720;
 const HEIGHT = 220;
@@ -60,6 +62,7 @@ export default function DinoGame() {
     }
     if (dinoY.current + DINO_H >= GROUND_Y) {
       dinoV.current = JUMP_V;
+      playSound("jump");
     }
   }, [reset]);
 
@@ -112,6 +115,7 @@ export default function DinoGame() {
       }
 
       if (dead) {
+        playSound("crash");
         setPhase("over");
         setBest((b) => Math.max(b, newScore));
         setScore(newScore);
@@ -141,16 +145,17 @@ export default function DinoGame() {
   }, [jump]);
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <button
           type="button"
           onPointerDown={(e) => {
             e.preventDefault();
             jump();
           }}
-          className="relative overflow-hidden border border-line text-left touch-manipulation select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation", background: "linear-gradient(to bottom, #fde68a, #fcd34d)" }}
+          className="relative h-full w-full overflow-hidden border border-line text-left touch-manipulation select-none"
+          style={{ touchAction: "manipulation", background: "linear-gradient(to bottom, #fde68a, #fcd34d)" }}
           aria-label="Jump"
         >
           {/* Ground line */}
@@ -158,7 +163,7 @@ export default function DinoGame() {
             className="absolute"
             style={{ left: 0, right: 0, top: GROUND_Y, height: 2, background: "#92400e" }}
           />
-          {/* Dino */}
+          {/* Dino (Chrome-style pixel T-rex, facing right) */}
           <span
             className="absolute"
             style={{
@@ -166,10 +171,75 @@ export default function DinoGame() {
               top: dinoY.current,
               width: DINO_W,
               height: DINO_H,
-              background: "#0f766e",
             }}
-          />
-          {/* Obstacles */}
+          >
+            {/* tail tip (far left) */}
+            <span
+              className="absolute"
+              style={{ left: 0, top: 17, width: 4, height: 3, background: "#3d7a3d" }}
+            />
+            {/* tail mid */}
+            <span
+              className="absolute"
+              style={{ left: 3, top: 14, width: 6, height: 6, background: "#3d7a3d" }}
+            />
+            {/* lower body */}
+            <span
+              className="absolute"
+              style={{ left: 7, top: 12, width: 11, height: 14, background: "#3d7a3d" }}
+            />
+            {/* upper back / neck */}
+            <span
+              className="absolute"
+              style={{ left: 14, top: 6, width: 8, height: 12, background: "#3d7a3d" }}
+            />
+            {/* head */}
+            <span
+              className="absolute"
+              style={{ left: 18, top: 2, width: 8, height: 10, background: "#3d7a3d" }}
+            />
+            {/* upper snout (extends right) */}
+            <span
+              className="absolute"
+              style={{ left: 22, top: 4, width: 6, height: 4, background: "#3d7a3d" }}
+            />
+            {/* lower jaw (shorter than upper snout, creating mouth notch) */}
+            <span
+              className="absolute"
+              style={{ left: 22, top: 10, width: 4, height: 2, background: "#3d7a3d" }}
+            />
+            {/* eye (single white pixel) */}
+            <span
+              className="absolute"
+              style={{ left: 22, top: 4, width: 2, height: 2, background: "#ffffff" }}
+            />
+            {/* tiny arm */}
+            <span
+              className="absolute"
+              style={{ left: 11, top: 18, width: 3, height: 3, background: "#3d7a3d" }}
+            />
+            {/* back leg */}
+            <span
+              className="absolute"
+              style={{ left: 7, top: 24, width: 4, height: 9, background: "#3d7a3d" }}
+            />
+            {/* back foot */}
+            <span
+              className="absolute"
+              style={{ left: 4, top: 32, width: 7, height: 4, background: "#3d7a3d" }}
+            />
+            {/* front leg */}
+            <span
+              className="absolute"
+              style={{ left: 15, top: 24, width: 4, height: 9, background: "#3d7a3d" }}
+            />
+            {/* front foot */}
+            <span
+              className="absolute"
+              style={{ left: 13, top: 32, width: 7, height: 4, background: "#3d7a3d" }}
+            />
+          </span>
+          {/* Obstacles (cacti) */}
           {obstacles.current.map((o, i) => (
             <span
               key={i}
@@ -180,6 +250,11 @@ export default function DinoGame() {
                 width: o.w,
                 height: o.h,
                 background: "#15803d",
+                backgroundImage:
+                  "repeating-linear-gradient(90deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 5px)",
+                borderRadius: "4px 4px 0 0",
+                boxShadow:
+                  "inset 0 0 0 1px rgba(0,0,0,0.25), inset -2px -3px 0 rgba(0,0,0,0.18)",
               }}
             />
           ))}
@@ -194,6 +269,7 @@ export default function DinoGame() {
             </span>
           )}
         </button>
+        </ResponsivePlayfield>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           Space, ↑, W, or tap to jump
         </p>

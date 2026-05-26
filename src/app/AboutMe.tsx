@@ -35,14 +35,14 @@ export default function AboutMe() {
 
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-labelledby="about-title"
           onClick={() => setOpen(false)}
         >
           <div
-            className="relative w-full max-w-xl border border-line bg-background p-8 sm:p-10"
+            className="relative w-full max-w-xl rounded-xl border border-accent/40 bg-background p-8 shadow-[0_24px_80px_-20px_rgba(0,0,0,0.6)] ring-1 ring-accent/10 sm:p-10"
             onClick={(e) => e.stopPropagation()}
           >
             <button

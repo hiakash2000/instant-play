@@ -1,3 +1,6 @@
+import Link from "next/link";
+import MuteToggle from "../MuteToggle";
+
 export default function GamesLayout({
   children,
 }: {
@@ -26,7 +29,26 @@ export default function GamesLayout({
           background: "radial-gradient(circle, #a78bfa, transparent 70%)",
         }}
       />
-      <div className="relative flex flex-1 flex-col">{children}</div>
+      <div className="relative flex flex-1 flex-col">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-6 pt-6 sm:px-10 sm:pt-8">
+          <Link
+            href="/"
+            className="group inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-muted backdrop-blur transition-all hover:border-foreground hover:text-foreground"
+          >
+            <span
+              aria-hidden
+              className="transition-transform group-hover:-translate-x-0.5"
+            >
+              ←
+            </span>
+            Back to all games
+          </Link>
+          <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 px-3.5 py-1.5 backdrop-blur">
+            <MuteToggle />
+          </span>
+        </div>
+        {children}
+      </div>
     </div>
   );
 }

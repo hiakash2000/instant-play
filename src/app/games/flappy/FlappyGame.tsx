@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePersistedBest } from "../../usePersistedBest";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const WIDTH = 360;
 const HEIGHT = 520;
@@ -58,6 +60,7 @@ export default function FlappyGame() {
     }
     if (phaseRef.current === "playing") {
       birdV.current = FLAP_V;
+      playSound("flap");
     } else if (phaseRef.current === "over") {
       reset();
     }
@@ -100,6 +103,7 @@ export default function FlappyGame() {
       }
 
       if (scored > 0) {
+        playSound("score");
         setScore((s) => {
           const ns = s + scored;
           setBest((b) => Math.max(b, ns));
@@ -108,6 +112,7 @@ export default function FlappyGame() {
       }
 
       if (dead) {
+        playSound("lose");
         setPhase("over");
       } else {
         force((n) => (n + 1) & 0xffff);
@@ -130,16 +135,17 @@ export default function FlappyGame() {
   const rotation = Math.max(-25, Math.min(70, birdV.current * 5));
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <button
           type="button"
           onPointerDown={(e) => {
             e.preventDefault();
             flap();
           }}
-          className="relative overflow-hidden border border-line touch-manipulation select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation", background: "linear-gradient(to bottom, #7dd3fc, #bae6fd)" }}
+          className="relative h-full w-full overflow-hidden border border-line touch-manipulation select-none"
+          style={{ touchAction: "manipulation", background: "linear-gradient(to bottom, #7dd3fc, #bae6fd)" }}
           aria-label="Flap"
         >
           <span
@@ -171,16 +177,86 @@ export default function FlappyGame() {
             </span>
           ))}
           <span
-            className="absolute rounded-full"
+            className="absolute"
             style={{
               left: BIRD_X - BIRD_R,
               top: birdY.current - BIRD_R,
               width: BIRD_R * 2,
               height: BIRD_R * 2,
               transform: `rotate(${rotation}deg)`,
-              background: "#facc15",
             }}
-          />
+          >
+            {/* body */}
+            <span
+              className="absolute rounded-full"
+              style={{
+                inset: 0,
+                background: "#facc15",
+                border: "1px solid #b45309",
+                boxShadow: "inset 0 -2px 0 rgba(0,0,0,0.25)",
+              }}
+            />
+            {/* wing */}
+            <span
+              className="absolute"
+              style={{
+                left: 3,
+                bottom: 5,
+                width: 10,
+                height: 5,
+                background: "#f59e0b",
+                border: "1px solid #b45309",
+                borderRadius: "3px 5px 5px 2px",
+              }}
+            />
+            {/* eye (white) */}
+            <span
+              className="absolute rounded-full"
+              style={{
+                right: 3,
+                top: 3,
+                width: 8,
+                height: 8,
+                background: "#ffffff",
+                border: "1px solid #0f172a",
+              }}
+            />
+            {/* pupil */}
+            <span
+              className="absolute rounded-full"
+              style={{
+                right: 4,
+                top: 5,
+                width: 3,
+                height: 3,
+                background: "#0f172a",
+              }}
+            />
+            {/* beak */}
+            <span
+              className="absolute"
+              style={{
+                right: -3,
+                top: 11,
+                width: 7,
+                height: 5,
+                background: "#ef4444",
+                border: "1px solid #7f1d1d",
+                borderRadius: "1px 3px 3px 1px",
+              }}
+            />
+            {/* beak split */}
+            <span
+              className="absolute"
+              style={{
+                right: -2,
+                top: 13,
+                width: 5,
+                height: 1,
+                background: "#7f1d1d",
+              }}
+            />
+          </span>
           {phase !== "playing" && (
             <span className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 text-center">
               <span className="font-serif text-3xl tracking-tight">
@@ -192,6 +268,7 @@ export default function FlappyGame() {
             </span>
           )}
         </button>
+        </ResponsivePlayfield>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           Click the board or press space · ↑ also flaps
         </p>

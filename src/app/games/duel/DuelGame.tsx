@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import ResponsivePlayfield from "../ResponsivePlayfield";
+import { playSound } from "../sound";
 
 const WIDTH = 720;
 const HEIGHT = 360;
@@ -190,14 +192,14 @@ export default function DuelGame() {
       if (playerHit) {
         setPlayerHP((hp) => {
           const next = hp - 1;
-          if (next <= 0) setPhase("lost");
+          if (next <= 0) { playSound("lose"); setPhase("lost"); } else { playSound("hit"); }
           return Math.max(0, next);
         });
       }
       if (enemyHit) {
         setEnemyHP((hp) => {
           const next = hp - 1;
-          if (next <= 0) setPhase("won");
+          if (next <= 0) { playSound("win"); setPhase("won"); } else { playSound("hit"); }
           return Math.max(0, next);
         });
       }
@@ -208,8 +210,9 @@ export default function DuelGame() {
   }, [phase, fire]);
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
+    <div className="grid gap-10 px-4 sm:px-0 lg:grid-cols-[auto_1fr]">
       <div className="flex flex-col gap-4">
+        <ResponsivePlayfield width={WIDTH} height={HEIGHT}>
         <button
           type="button"
           onPointerDown={(e) => {
@@ -226,8 +229,8 @@ export default function DuelGame() {
             if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
             trackPointer(e);
           }}
-          className="relative overflow-hidden border border-line bg-surface text-left touch-none select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
+          className="relative h-full w-full overflow-hidden border border-line bg-surface text-left touch-none select-none"
+          style={{ touchAction: "none" }}
           aria-label="Duel"
         >
           {/* Mid-field line */}
@@ -294,6 +297,7 @@ export default function DuelGame() {
             </span>
           )}
         </button>
+        </ResponsivePlayfield>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           ↑ ↓ or W S or drag on the field to dodge · auto-fires
         </p>

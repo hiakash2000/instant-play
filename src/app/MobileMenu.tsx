@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import AboutMe from "./AboutMe";
 import ThemeToggle from "./ThemeToggle";
+import MuteToggle from "./MuteToggle";
 
 export default function MobileMenu() {
   const [open, setOpen] = useState(false);
@@ -80,6 +81,9 @@ export default function MobileMenu() {
               </li>
               <li>
                 <AboutMe />
+              </li>
+              <li>
+                <MuteToggle />
               </li>
               <li>
                 <ThemeToggle />
