@@ -23,7 +23,7 @@ export default function Page() {
         stack left or right so the gap is under the ball before it lands.
       </p>
       <div className="mt-12">
-        <MobileFullscreen orientation="portrait">
+        <MobileFullscreen orientation="portrait" scorePlacement="below">
           <BallFallGame />
         </MobileFullscreen>
       </div>

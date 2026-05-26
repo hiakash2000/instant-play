@@ -95,9 +95,24 @@ export default function DuelGame() {
     };
   }, [fire]);
 
+  const trackPointer = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      if (rect.height === 0) return;
+      const relY = ((e.clientY - rect.top) / rect.height) * HEIGHT;
+      playerY.current = Math.max(
+        0,
+        Math.min(HEIGHT - FIGHTER_H, relY - FIGHTER_H / 2),
+      );
+    },
+    [],
+  );
+
   useEffect(() => {
     if (phase !== "playing") return;
     const id = window.setInterval(() => {
+      fire();
+
       // Player movement.
       const k = keys.current;
       if (k.has("ArrowUp") || k.has("w") || k.has("W")) {
@@ -190,7 +205,7 @@ export default function DuelGame() {
       force((n) => (n + 1) & 0xffff);
     }, TICK_MS);
     return () => window.clearInterval(id);
-  }, [phase]);
+  }, [phase, fire]);
 
   return (
     <div className="grid gap-10 lg:grid-cols-[auto_1fr]">
@@ -199,11 +214,20 @@ export default function DuelGame() {
           type="button"
           onPointerDown={(e) => {
             e.preventDefault();
-            if (phaseRef.current === "playing") fire();
-            else reset();
+            if (phaseRef.current !== "playing") {
+              reset();
+              return;
+            }
+            e.currentTarget.setPointerCapture(e.pointerId);
+            trackPointer(e);
           }}
-          className="relative overflow-hidden border border-line bg-surface text-left touch-manipulation select-none"
-          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "manipulation" }}
+          onPointerMove={(e) => {
+            if (phaseRef.current !== "playing") return;
+            if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+            trackPointer(e);
+          }}
+          className="relative overflow-hidden border border-line bg-surface text-left touch-none select-none"
+          style={{ width: WIDTH, height: HEIGHT, maxWidth: "100%", touchAction: "none" }}
           aria-label="Duel"
         >
           {/* Mid-field line */}
@@ -264,43 +288,14 @@ export default function DuelGame() {
               </span>
               <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
                 {phase === "idle"
-                  ? "Click or space to begin"
-                  : "Click or space to replay"}
+                  ? "Tap or space to begin"
+                  : "Tap or space to replay"}
               </span>
             </span>
           )}
         </button>
-        <div className="flex gap-3 lg:hidden">
-          <HoldButton
-            onPress={() => keys.current.add("ArrowUp")}
-            onRelease={() => keys.current.delete("ArrowUp")}
-            label="Up"
-          >
-            ↑
-          </HoldButton>
-          <button
-            type="button"
-            onPointerDown={(e) => {
-              e.preventDefault();
-              if (phaseRef.current === "playing") fire();
-              else reset();
-            }}
-            className="flex-1 border border-line bg-surface py-4 font-mono text-xs uppercase tracking-[0.2em] touch-manipulation select-none"
-            style={{ touchAction: "manipulation" }}
-            aria-label="Fire"
-          >
-            Fire
-          </button>
-          <HoldButton
-            onPress={() => keys.current.add("ArrowDown")}
-            onRelease={() => keys.current.delete("ArrowDown")}
-            label="Down"
-          >
-            ↓
-          </HoldButton>
-        </div>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          ↑ ↓ or W S to dodge · Space or tap to fire
+          ↑ ↓ or W S or drag on the field to dodge · auto-fires
         </p>
       </div>
 
@@ -321,40 +316,6 @@ export default function DuelGame() {
         </div>
       </div>
     </div>
-  );
-}
-
-function HoldButton({
-  onPress,
-  onRelease,
-  label,
-  children,
-}: {
-  onPress: () => void;
-  onRelease: () => void;
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onPointerDown={(e) => {
-        e.preventDefault();
-        e.currentTarget.setPointerCapture(e.pointerId);
-        onPress();
-      }}
-      onPointerUp={(e) => {
-        e.preventDefault();
-        onRelease();
-      }}
-      onPointerCancel={() => onRelease()}
-      onPointerLeave={() => onRelease()}
-      aria-label={label}
-      className="w-20 border border-line bg-surface py-4 font-mono text-lg touch-manipulation select-none active:bg-line"
-      style={{ touchAction: "none" }}
-    >
-      {children}
-    </button>
   );
 }
 

@@ -23,7 +23,7 @@ export default function Page() {
         upgrades, survive.
       </p>
       <div className="mt-12">
-        <MobileFullscreen orientation="landscape">
+        <MobileFullscreen orientation="landscape" scorePlacement="side">
           <VampireSurvivorsGame />
         </MobileFullscreen>
       </div>

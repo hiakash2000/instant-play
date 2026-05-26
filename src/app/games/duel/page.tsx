@@ -23,7 +23,7 @@ export default function Page() {
         Whoever runs out of life first loses.
       </p>
       <div className="mt-12">
-        <MobileFullscreen orientation="landscape">
+        <MobileFullscreen orientation="landscape" scorePlacement="side">
           <DuelGame />
         </MobileFullscreen>
       </div>

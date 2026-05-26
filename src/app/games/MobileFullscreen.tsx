@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 type Props = {
   orientation: "landscape" | "portrait";
+  scorePlacement?: "overlay" | "below" | "side";
   children: React.ReactNode;
 };
 
@@ -118,12 +119,17 @@ function restore(s: Snapshot) {
   s.el.style.cssText = s.cssText;
 }
 
-export default function MobileFullscreen({ orientation, children }: Props) {
+export default function MobileFullscreen({
+  orientation,
+  scorePlacement = "overlay",
+  children,
+}: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const hiddenRef = useRef<HTMLElement[]>([]);
   const playfieldSnapRef = useRef<Snapshot | null>(null);
   const scoreMoveRef = useRef<ScoreMove | null>(null);
+  const sideGridSnapRef = useRef<Snapshot | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [needsRotate, setNeedsRotate] = useState(false);
@@ -171,6 +177,10 @@ export default function MobileFullscreen({ orientation, children }: Props) {
         restore(playfieldSnapRef.current);
         playfieldSnapRef.current = null;
       }
+      if (sideGridSnapRef.current) {
+        restore(sideGridSnapRef.current);
+        sideGridSnapRef.current = null;
+      }
       return;
     }
 
@@ -183,8 +193,23 @@ export default function MobileFullscreen({ orientation, children }: Props) {
     });
     hiddenRef.current = targets;
 
+    if (scorePlacement === "side") {
+      const outer = inner.firstElementChild as HTMLElement | null;
+      const cls =
+        outer && typeof outer.className === "string" ? outer.className : "";
+      if (outer && cls.includes("grid")) {
+        sideGridSnapRef.current = snapshot(outer);
+        outer.style.gridTemplateColumns = "auto auto";
+        outer.style.alignItems = "start";
+        outer.style.gap = "0.75rem";
+      }
+    }
+
     const playfield = findPlayfield(inner);
-    const panel = playfield ? findScorePanel(inner, playfield) : null;
+    const panel =
+      playfield && scorePlacement === "overlay"
+        ? findScorePanel(inner, playfield)
+        : null;
 
     if (playfield && panel) {
       playfieldSnapRef.current = snapshot(playfield);
@@ -284,7 +309,7 @@ export default function MobileFullscreen({ orientation, children }: Props) {
       ro.disconnect();
       window.removeEventListener("orientationchange", compute);
     };
-  }, [isFullscreen, isMobile, orientation]);
+  }, [isFullscreen, isMobile, orientation, scorePlacement]);
 
   const enter = useCallback(async () => {
     const el = stageRef.current as FsElement | null;

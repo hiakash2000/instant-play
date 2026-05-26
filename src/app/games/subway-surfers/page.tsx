@@ -22,7 +22,7 @@ export default function Page() {
         Three lanes, one runner, an endless yard of trains and barriers.
       </p>
       <div className="mt-12">
-        <MobileFullscreen orientation="portrait">
+        <MobileFullscreen orientation="portrait" scorePlacement="below">
           <SubwaySurfersGame />
         </MobileFullscreen>
       </div>

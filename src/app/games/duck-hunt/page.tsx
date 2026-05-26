@@ -23,7 +23,7 @@ export default function Page() {
         will hide in the bush and pop up where you aren&apos;t looking.
       </p>
       <div className="mt-12">
-        <MobileFullscreen orientation="landscape">
+        <MobileFullscreen orientation="landscape" scorePlacement="side">
           <DuckHuntGame />
         </MobileFullscreen>
       </div>

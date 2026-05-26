@@ -23,7 +23,7 @@ export default function Page() {
         that way.
       </p>
       <div className="mt-12">
-        <MobileFullscreen orientation="portrait">
+        <MobileFullscreen orientation="portrait" scorePlacement="below">
           <CatsGame />
         </MobileFullscreen>
       </div>
