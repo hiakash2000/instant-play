@@ -23,7 +23,7 @@ export default function Page() {
         longer you survive.
       </p>
       <div className="mt-12">
-        <MobileFullscreen orientation="landscape">
+        <MobileFullscreen orientation="landscape" scorePlacement="side">
           <DinoGame />
         </MobileFullscreen>
       </div>
