@@ -336,7 +336,7 @@ export default function Home() {
                     style={{ background: category.hue }}
                   />
                   <div
-                    className="flex h-40 items-center justify-center rounded-lg border border-line/60"
+                    className="pv-stage flex h-40 items-center justify-center rounded-lg border border-line/60"
                     style={{
                       background: `linear-gradient(135deg, ${category.hue}1f, transparent 65%)`,
                     }}

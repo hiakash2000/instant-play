@@ -130,24 +130,29 @@ body {
   50% { opacity: 1; }
 }
 
-.group:hover .pv-bob { animation: pv-bob 1s ease-in-out infinite; }
-.group:hover .pv-slide-x { animation: pv-slide-x 1.4s ease-in-out infinite; }
-.group:hover .pv-spin { animation: pv-spin 2.4s linear infinite; }
-.group:hover .pv-jump { animation: pv-jump 1.2s ease-in-out infinite; }
-.group:hover .pv-fall { animation: pv-fall 1.6s ease-in infinite; }
-.group:hover .pv-rise { animation: pv-rise 1.6s ease-out infinite; }
-.group:hover .pv-shoot-r { animation: pv-shoot-r 1.2s ease-out infinite; }
-.group:hover .pv-shoot-l { animation: pv-shoot-l 1.2s ease-out infinite; }
-.group:hover .pv-pulse { animation: pv-pulse 1.4s ease-in-out infinite; }
-.group:hover .pv-scroll-y { animation: pv-scroll-y 1.8s linear infinite; }
-.group:hover .pv-flicker { animation: pv-flicker 1.4s ease-in-out infinite; }
+.pv-bob { animation: pv-bob 1s ease-in-out infinite; }
+.pv-slide-x { animation: pv-slide-x 1.4s ease-in-out infinite; }
+.pv-spin { animation: pv-spin 2.4s linear infinite; }
+.pv-jump { animation: pv-jump 1.2s ease-in-out infinite; }
+.pv-fall { animation: pv-fall 1.6s ease-in infinite; }
+.pv-rise { animation: pv-rise 1.6s ease-out infinite; }
+.pv-shoot-r { animation: pv-shoot-r 1.2s ease-out infinite; }
+.pv-shoot-l { animation: pv-shoot-l 1.2s ease-out infinite; }
+.pv-pulse { animation: pv-pulse 1.4s ease-in-out infinite; }
+.pv-scroll-y { animation: pv-scroll-y 1.8s linear infinite; }
+.pv-flicker { animation: pv-flicker 1.4s ease-in-out infinite; }
 
-.group:hover [class*="pv-"][data-delay="1"] { animation-delay: 0.1s; }
-.group:hover [class*="pv-"][data-delay="2"] { animation-delay: 0.2s; }
-.group:hover [class*="pv-"][data-delay="3"] { animation-delay: 0.3s; }
-.group:hover [class*="pv-"][data-delay="4"] { animation-delay: 0.4s; }
-.group:hover [class*="pv-"][data-delay="5"] { animation-delay: 0.5s; }
+[class*="pv-"][data-delay="1"] { animation-delay: 0.1s; }
+[class*="pv-"][data-delay="2"] { animation-delay: 0.2s; }
+[class*="pv-"][data-delay="3"] { animation-delay: 0.3s; }
+[class*="pv-"][data-delay="4"] { animation-delay: 0.4s; }
+[class*="pv-"][data-delay="5"] { animation-delay: 0.5s; }
+
+.pv-stage {
+  content-visibility: auto;
+  contain-intrinsic-size: 160px;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .group:hover [class*="pv-"] { animation: none !important; }
+  [class*="pv-"] { animation: none !important; }
 }
