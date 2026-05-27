@@ -23,7 +23,7 @@ export default function Page() {
         next plank. The higher you climb, the more the planks slide.
       </p>
       <div className="mt-12">
-        <MobileFullscreen orientation="portrait">
+        <MobileFullscreen orientation="portrait" scorePlacement="below">
           <JumpUpGame />
         </MobileFullscreen>
       </div>

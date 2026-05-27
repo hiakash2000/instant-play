@@ -23,7 +23,7 @@ export default function Page() {
         enough to dunk it.
       </p>
       <div className="mt-12">
-        <MobileFullscreen orientation="portrait">
+        <MobileFullscreen orientation="portrait" scorePlacement="below">
           <FlappyDunkGame />
         </MobileFullscreen>
       </div>

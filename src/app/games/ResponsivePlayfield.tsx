@@ -42,7 +42,9 @@ export default function ResponsivePlayfield({
       style={{
         width: "100%",
         maxWidth: width,
+        minWidth: 0,
         height: height * scale,
+        position: "relative",
         overflow: "hidden",
         marginLeft: "auto",
         marginRight: "auto",
@@ -50,6 +52,9 @@ export default function ResponsivePlayfield({
     >
       <div
         style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
           width,
           height,
           transform: `scale(${scale})`,

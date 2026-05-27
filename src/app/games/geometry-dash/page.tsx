@@ -22,7 +22,7 @@ export default function Page() {
         The square never stops running. Time your jumps to clear the spikes.
       </p>
       <div className="mt-12">
-        <MobileFullscreen orientation="landscape" scorePlacement="side">
+        <MobileFullscreen orientation="landscape">
           <GeometryDashGame />
         </MobileFullscreen>
       </div>

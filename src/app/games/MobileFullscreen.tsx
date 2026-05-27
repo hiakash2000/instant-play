@@ -55,6 +55,14 @@ function collectNonEssential(root: HTMLElement): HTMLElement[] {
 }
 
 function findPlayfield(root: HTMLElement): HTMLElement | null {
+  const pfInner = Array.from(root.querySelectorAll<HTMLElement>("div")).find(
+    (d) =>
+      d.style.position === "absolute" &&
+      d.style.top === "0px" &&
+      d.style.left === "0px" &&
+      parseFloat(d.style.width) > 0,
+  );
+  if (pfInner) return pfInner;
   for (const el of Array.from(root.querySelectorAll<HTMLElement>("div"))) {
     const cls = typeof el.className === "string" ? el.className : "";
     if (
@@ -100,7 +108,44 @@ function findScorePanel(
     if (count >= 2 && !multiHit) multiHit = div;
     if (count >= 1 && !singleHit) singleHit = div;
   }
-  return multiHit ?? singleHit;
+  const detected = multiHit ?? singleHit;
+  if (!detected) return null;
+  let walker: HTMLElement = detected;
+  while (walker.parentElement && walker.parentElement !== root) {
+    const up: HTMLElement = walker.parentElement;
+    const cls = typeof up.className === "string" ? up.className : "";
+    if (cls.includes("grid") && cls.includes("gap-px") && cls.includes("bg-line")) {
+      return up;
+    }
+    walker = up;
+  }
+  return detected;
+}
+
+function shrinkScorePanel(panel: HTMLElement): Snapshot[] {
+  const snaps: Snapshot[] = [];
+  Array.from(panel.children).forEach((c) => {
+    const el = c as HTMLElement;
+    snaps.push(snapshot(el));
+    el.style.padding = "6px 8px";
+  });
+  panel.querySelectorAll<HTMLElement>("p, span").forEach((textEl) => {
+    const cls = typeof textEl.className === "string" ? textEl.className : "";
+    const isLabel = cls.includes("uppercase");
+    const isValue = cls.includes("font-serif");
+    if (!isLabel && !isValue) return;
+    snaps.push(snapshot(textEl));
+    textEl.style.marginTop = "2px";
+    textEl.style.lineHeight = "1";
+    if (isLabel) {
+      textEl.style.fontSize = "9px";
+      textEl.style.letterSpacing = "0.1em";
+    } else {
+      textEl.style.fontSize = "16px";
+      textEl.style.fontWeight = "600";
+    }
+  });
+  return snaps;
 }
 
 type Snapshot = { el: HTMLElement; cssText: string };
@@ -130,6 +175,11 @@ export default function MobileFullscreen({
   const playfieldSnapRef = useRef<Snapshot | null>(null);
   const scoreMoveRef = useRef<ScoreMove | null>(null);
   const sideSnapsRef = useRef<Snapshot[]>([]);
+  const panelShrinkRef = useRef<Snapshot[]>([]);
+  const belowMoveRef = useRef<ScoreMove | null>(null);
+  const innerSizeSnapRef = useRef<Snapshot | null>(null);
+  const respOuterSnapRef = useRef<Snapshot | null>(null);
+  const gridSnapRef = useRef<Snapshot | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [needsRotate, setNeedsRotate] = useState(false);
@@ -197,6 +247,28 @@ export default function MobileFullscreen({
         sideSnapsRef.current.forEach(restore);
         sideSnapsRef.current = [];
       }
+      if (panelShrinkRef.current.length) {
+        panelShrinkRef.current.forEach(restore);
+        panelShrinkRef.current = [];
+      }
+      const belowMove = belowMoveRef.current;
+      if (belowMove) {
+        restore(belowMove.panelSnap);
+        belowMove.parent.insertBefore(belowMove.panel, belowMove.next);
+        belowMoveRef.current = null;
+      }
+      if (innerSizeSnapRef.current) {
+        restore(innerSizeSnapRef.current);
+        innerSizeSnapRef.current = null;
+      }
+      if (respOuterSnapRef.current) {
+        restore(respOuterSnapRef.current);
+        respOuterSnapRef.current = null;
+      }
+      if (gridSnapRef.current) {
+        restore(gridSnapRef.current);
+        gridSnapRef.current = null;
+      }
       return;
     }
 
@@ -232,6 +304,61 @@ export default function MobileFullscreen({
       playfield && scorePlacement === "overlay"
         ? findScorePanel(inner, playfield)
         : null;
+
+    if (scorePlacement === "below" && stageRef.current) {
+      const shrinkTarget = findScorePanel(inner, playfield);
+      if (shrinkTarget) {
+        panelShrinkRef.current = shrinkScorePanel(shrinkTarget);
+        const panelSnap = snapshot(shrinkTarget);
+        belowMoveRef.current = {
+          panel: shrinkTarget,
+          parent: shrinkTarget.parentNode!,
+          next: shrinkTarget.nextSibling,
+          panelSnap,
+          childSnaps: [],
+        };
+        shrinkTarget.style.position = "absolute";
+        shrinkTarget.style.bottom = "10px";
+        shrinkTarget.style.left = "50%";
+        shrinkTarget.style.transform = "translateX(-50%)";
+        shrinkTarget.style.zIndex = "20";
+        stageRef.current.appendChild(shrinkTarget);
+      }
+    } else if (scorePlacement === "side") {
+      const shrinkTarget = findScorePanel(inner, playfield);
+      if (shrinkTarget) {
+        panelShrinkRef.current = shrinkScorePanel(shrinkTarget);
+      }
+    }
+
+    const pfInner = Array.from(inner.querySelectorAll<HTMLElement>("div")).find(
+      (d) =>
+        d.style.position === "absolute" &&
+        d.style.top === "0px" &&
+        d.style.left === "0px" &&
+        parseFloat(d.style.width) > 0,
+    );
+    if (pfInner) {
+      const w = parseFloat(pfInner.style.width);
+      if (w > 0) {
+        innerSizeSnapRef.current = snapshot(inner);
+        const sidePadding = scorePlacement === "side" ? 280 : 0;
+        inner.style.width = `${w + sidePadding}px`;
+      }
+      const respOuter = pfInner.parentElement as HTMLElement | null;
+      if (respOuter && respOuter !== inner) {
+        respOuterSnapRef.current = snapshot(respOuter);
+        respOuter.style.width = `${parseFloat(pfInner.style.width)}px`;
+        respOuter.style.maxWidth = "none";
+      }
+      const gridContainer = inner.firstElementChild as HTMLElement | null;
+      if (gridContainer) {
+        gridSnapRef.current = snapshot(gridContainer);
+        gridContainer.style.paddingLeft = "0";
+        gridContainer.style.paddingRight = "0";
+        gridContainer.style.justifyItems = "center";
+      }
+    }
 
     if (playfield && panel) {
       playfieldSnapRef.current = snapshot(playfield);
@@ -314,8 +441,21 @@ export default function MobileFullscreen({
       innerEl.style.transform = "none";
       const rect = innerEl.getBoundingClientRect();
       innerEl.style.transform = prev;
-      const naturalW = rect.width;
-      const naturalH = rect.height;
+      let naturalW = rect.width;
+      let naturalH = rect.height;
+      const pfInner = Array.from(innerEl.querySelectorAll<HTMLElement>("div")).find(
+        (d) =>
+          d.style.position === "absolute" &&
+          d.style.top === "0px" &&
+          d.style.left === "0px" &&
+          parseFloat(d.style.width) > 0,
+      );
+      if (pfInner) {
+        const w = parseFloat(pfInner.style.width);
+        const h = parseFloat(pfInner.style.height);
+        if (w > naturalW) naturalW = w;
+        if (h > naturalH) naturalH = h;
+      }
       if (naturalW > 0 && naturalH > 0) {
         const pad = 0.96;
         const s = Math.min((sw / naturalW) * pad, (sh / naturalH) * pad);

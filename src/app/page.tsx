@@ -375,12 +375,14 @@ export default function Home() {
 
 function TicTacToePreview() {
   const cells: Array<"X" | "O" | ""> = ["X", "", "O", "", "X", "", "O", "", "X"];
+  const diag = new Set([0, 4, 8]);
   return (
     <div className="grid grid-cols-3 gap-2">
       {cells.map((c, i) => (
         <div
           key={i}
-          className="flex h-10 w-10 items-center justify-center border border-line font-serif text-xl"
+          className={`flex h-10 w-10 items-center justify-center border border-line font-serif text-xl ${diag.has(i) ? "pv-pulse" : ""}`}
+          data-delay={diag.has(i) ? (i === 0 ? "1" : i === 4 ? "2" : "3") : undefined}
           style={{ color: c === "X" ? "#ff5d8f" : c === "O" ? "#38bdf8" : undefined }}
         >
           {c}
@@ -406,7 +408,7 @@ function SnakePreview() {
         return (
           <div
             key={i}
-            className="h-4 w-4 border border-line"
+            className={`h-4 w-4 border border-line ${isHead ? "pv-slide-x" : isFood ? "pv-pulse" : ""}`}
             style={{
               backgroundColor: isHead
                 ? "#22c55e"
@@ -415,6 +417,7 @@ function SnakePreview() {
                   : isFood
                     ? "#ef4444"
                     : undefined,
+              ["--pv-d" as string]: isHead ? "8px" : undefined,
             }}
           />
         );
@@ -426,7 +429,7 @@ function SnakePreview() {
 function FlappyPreview() {
   return (
     <div className="relative h-24 w-32 border border-line" style={{ background: "linear-gradient(to bottom, rgba(56,189,248,0.15), transparent)" }}>
-      <span className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full" style={{ background: "#facc15" }} />
+      <span className="pv-bob absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full" style={{ background: "#facc15", ["--pv-d" as string]: "10px" }} />
       <span className="absolute left-16 top-0 h-8 w-4" style={{ background: "#22c55e" }} />
       <span className="absolute left-16 bottom-0 h-10 w-4" style={{ background: "#22c55e" }} />
       <span className="absolute right-2 top-0 h-12 w-4" style={{ background: "#22c55e" }} />
@@ -439,9 +442,9 @@ function DinoPreview() {
   return (
     <div className="relative h-24 w-36 border border-line" style={{ background: "linear-gradient(to bottom, #fde68a, #fcd34d)" }}>
       <span className="absolute left-0 right-0 bottom-4 h-px" style={{ background: "#92400e" }} />
-      <span className="absolute left-4 bottom-4 h-5 w-4" style={{ background: "#0f766e" }} />
-      <span className="absolute left-16 bottom-4 h-6 w-3" style={{ background: "#15803d" }} />
-      <span className="absolute left-24 bottom-4 h-4 w-3" style={{ background: "#15803d" }} />
+      <span className="pv-jump absolute left-4 bottom-4 h-5 w-4" style={{ background: "#0f766e", ["--pv-d" as string]: "14px" }} />
+      <span className="pv-slide-x absolute left-16 bottom-4 h-6 w-3" style={{ background: "#15803d", ["--pv-d" as string]: "-30px" }} />
+      <span className="pv-slide-x absolute left-24 bottom-4 h-4 w-3" style={{ background: "#15803d", ["--pv-d" as string]: "-50px" }} data-delay="2" />
     </div>
   );
 }
@@ -450,10 +453,10 @@ function DuckHuntPreview() {
   return (
     <div className="relative h-24 w-36 border border-line" style={{ background: "linear-gradient(to bottom, #93c5fd, #bfdbfe)" }}>
       <span className="absolute left-0 right-0 bottom-0 h-6" style={{ background: "#15803d" }} />
-      <span className="absolute right-3 top-3 h-3 w-5" style={{ background: "#7c2d12" }} />
-      <span className="absolute left-6 top-1/2 h-3 w-5" style={{ background: "rgba(124,45,18,0.6)" }} />
+      <span className="pv-bob absolute right-3 top-3 h-3 w-5" style={{ background: "#7c2d12", ["--pv-d" as string]: "6px" }} />
+      <span className="pv-bob absolute left-6 top-1/2 h-3 w-5" style={{ background: "rgba(124,45,18,0.6)", ["--pv-d" as string]: "4px" }} data-delay="2" />
       <span
-        className="absolute left-14 top-1/3 h-px w-12 origin-left -rotate-12"
+        className="pv-flicker absolute left-14 top-1/3 h-px w-12 origin-left -rotate-12"
         style={{
           color: "#dc2626",
           backgroundImage:
@@ -470,8 +473,8 @@ function DuelPreview() {
       <span className="absolute left-1/2 top-2 bottom-2 w-px bg-line" />
       <span className="absolute left-3 top-1/2 h-10 w-3 -translate-y-1/2" style={{ background: "#ef4444" }} />
       <span className="absolute right-3 top-1/3 h-10 w-3" style={{ background: "#3b82f6" }} />
-      <span className="absolute left-8 top-1/2 h-1 w-3 -translate-y-1/2" style={{ background: "#ef4444" }} />
-      <span className="absolute right-8 top-1/2 h-1 w-3 -translate-y-1/2" style={{ background: "#3b82f6" }} />
+      <span className="pv-shoot-r absolute left-8 top-1/2 h-1 w-3 -translate-y-1/2" style={{ background: "#ef4444", ["--pv-d" as string]: "70px" }} />
+      <span className="pv-shoot-l absolute right-8 top-1/2 h-1 w-3 -translate-y-1/2" style={{ background: "#3b82f6", ["--pv-d" as string]: "70px" }} data-delay="3" />
     </div>
   );
 }
@@ -480,7 +483,7 @@ function GeometryDashPreview() {
   return (
     <div className="relative h-24 w-36 border border-line" style={{ background: "linear-gradient(135deg, #1e1b4b, #312e81)" }}>
       <span className="absolute left-0 right-0 bottom-3 h-px" style={{ background: "#a78bfa" }} />
-      <span className="absolute left-3 bottom-3 h-4 w-4" style={{ background: "#22d3ee" }} />
+      <span className="pv-jump absolute left-3 bottom-3 h-4 w-4" style={{ background: "#22d3ee", ["--pv-d" as string]: "18px" }} />
       <span
         className="absolute left-16 bottom-3 h-3 w-3"
         style={{ clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)", background: "#f472b6" }}
@@ -496,7 +499,7 @@ function GeometryDashPreview() {
 function BallFallPreview() {
   return (
     <div className="relative h-24 w-32 border border-line">
-      <span className="absolute left-1/2 top-2 h-2 w-2 -translate-x-1/2 rounded-full" style={{ background: "#f97316" }} />
+      <span className="pv-bob absolute left-1/2 top-2 h-2 w-2 -translate-x-1/2 rounded-full" style={{ background: "#f97316", ["--pv-d" as string]: "-6px" }} />
       <span className="absolute left-0 top-7 h-1 w-8" style={{ background: "#22d3ee" }} />
       <span className="absolute right-0 top-7 h-1 w-16" style={{ background: "#22d3ee" }} />
       <span className="absolute left-0 top-12 h-1 w-20" style={{ background: "#a78bfa" }} />
@@ -515,7 +518,7 @@ function SubwaySurfersPreview() {
       <span className="absolute left-1/3 top-0 bottom-0 w-px" style={{ background: "#facc15" }} />
       <span className="absolute left-2/3 top-0 bottom-0 w-px" style={{ background: "#facc15" }} />
       <span className="absolute left-3 bottom-3 h-4 w-3" style={{ background: "#ec4899" }} />
-      <span className="absolute left-1/2 top-6 h-5 w-5 -translate-x-1/2" style={{ background: "#f97316" }} />
+      <span className="pv-slide-x absolute left-1/2 top-6 h-5 w-5 -translate-x-1/2" style={{ background: "#f97316", ["--pv-d" as string]: "30px" }} />
       <span className="absolute right-3 top-12 h-4 w-3" style={{ background: "#22d3ee" }} />
     </div>
   );
@@ -523,7 +526,7 @@ function SubwaySurfersPreview() {
 
 function FruitStabPreview() {
   return (
-    <div className="relative h-24 w-24">
+    <div className="pv-spin relative h-24 w-24">
       <span className="absolute inset-2 rounded-full" style={{ background: "#ef4444", border: "2px solid #b91c1c" }} />
       <span className="absolute left-1/2 top-1 h-3 w-1 -translate-x-1/2" style={{ background: "#15803d" }} />
       <span className="absolute left-1/2 top-2 h-3 w-px -translate-x-1/2" style={{ background: "#9ca3af" }} />
@@ -541,8 +544,10 @@ function DriftBossPreview() {
         stroke="#7dd3fc"
         strokeWidth="10"
         fill="none"
+        strokeDasharray="6 4"
+        className="pv-flicker"
       />
-      <circle cx="50" cy="30" r="4" fill="#ec4899" />
+      <circle cx="50" cy="30" r="4" fill="#ec4899" className="pv-bob" style={{ ["--pv-d" as string]: "8px", transformOrigin: "center" }} />
     </svg>
   );
 }
@@ -550,7 +555,7 @@ function DriftBossPreview() {
 function FlappyDunkPreview() {
   return (
     <div className="relative h-24 w-24 border border-line">
-      <span className="absolute left-1/2 top-3 h-3 w-3 -translate-x-1/2 rounded-full" style={{ background: "#f97316" }} />
+      <span className="pv-fall absolute left-1/2 top-3 h-3 w-3 -translate-x-1/2 rounded-full" style={{ background: "#f97316", ["--pv-from" as string]: "-8px", ["--pv-to" as string]: "50px" }} />
       <span className="absolute left-1/4 right-1/4 bottom-6 h-px" style={{ background: "#ef4444" }} />
       <span className="absolute left-1/4 bottom-4 h-2 w-px" style={{ background: "#ef4444" }} />
       <span className="absolute right-1/4 bottom-4 h-2 w-px" style={{ background: "#ef4444" }} />
@@ -563,11 +568,11 @@ function RoadFighterPreview() {
     <div className="relative h-24 w-32 border border-line" style={{ background: "#1f2937" }}>
       <span className="absolute top-0 bottom-0 left-0 w-3" style={{ background: "#16a34a" }} />
       <span className="absolute top-0 bottom-0 right-0 w-3" style={{ background: "#16a34a" }} />
-      <span className="absolute left-1/2 top-1 h-2 w-px -translate-x-1/2" style={{ background: "#facc15" }} />
-      <span className="absolute left-1/2 top-7 h-2 w-px -translate-x-1/2" style={{ background: "#facc15" }} />
-      <span className="absolute left-1/2 top-13 h-2 w-px -translate-x-1/2" style={{ background: "#facc15" }} />
-      <span className="absolute left-5 top-4 h-4 w-3" style={{ background: "#3b82f6" }} />
-      <span className="absolute right-6 top-10 h-4 w-3" style={{ background: "#a78bfa" }} />
+      <span className="pv-scroll-y absolute left-1/2 top-1 h-2 w-px -translate-x-1/2" style={{ background: "#facc15", ["--pv-from" as string]: "-12px", ["--pv-to" as string]: "100px" }} />
+      <span className="pv-scroll-y absolute left-1/2 top-7 h-2 w-px -translate-x-1/2" style={{ background: "#facc15", ["--pv-from" as string]: "-12px", ["--pv-to" as string]: "100px" }} data-delay="2" />
+      <span className="pv-scroll-y absolute left-1/2 top-13 h-2 w-px -translate-x-1/2" style={{ background: "#facc15", ["--pv-from" as string]: "-12px", ["--pv-to" as string]: "100px" }} data-delay="4" />
+      <span className="pv-scroll-y absolute left-5 top-4 h-4 w-3" style={{ background: "#3b82f6", ["--pv-from" as string]: "-30px", ["--pv-to" as string]: "100px" }} />
+      <span className="pv-scroll-y absolute right-6 top-10 h-4 w-3" style={{ background: "#a78bfa", ["--pv-from" as string]: "-50px", ["--pv-to" as string]: "100px" }} data-delay="3" />
       <span className="absolute left-1/2 bottom-2 h-5 w-3 -translate-x-1/2" style={{ background: "#ef4444" }} />
     </div>
   );
@@ -579,7 +584,7 @@ function JumpUpPreview() {
       <span className="absolute left-3 top-3 h-1 w-8" style={{ background: "#f472b6" }} />
       <span className="absolute right-3 top-9 h-1 w-10" style={{ background: "#22d3ee" }} />
       <span className="absolute left-2 top-16 h-1 w-9" style={{ background: "#a78bfa" }} />
-      <span className="absolute left-1/2 top-12 h-3 w-3 -translate-x-1/2 rounded-full" style={{ background: "#facc15" }} />
+      <span className="pv-jump absolute left-1/2 top-12 h-3 w-3 -translate-x-1/2 rounded-full" style={{ background: "#facc15", ["--pv-d" as string]: "26px" }} />
       <span className="absolute right-3 bottom-3 h-1 w-12" style={{ background: "#4ade80" }} />
     </div>
   );
@@ -595,7 +600,8 @@ function CatsPreview() {
         return (
           <span
             key={i}
-            className="h-5 w-5 rounded-sm border border-line"
+            className={`h-5 w-5 rounded-sm border border-line ${idx !== undefined ? "pv-pulse" : ""}`}
+            data-delay={idx !== undefined ? String((idx % 5) + 1) : undefined}
             style={{ background: idx !== undefined ? palette[idx] : undefined }}
           />
         );
@@ -607,13 +613,13 @@ function CatsPreview() {
 function SpaceInvadersPreview() {
   return (
     <div className="relative h-24 w-32 border border-line" style={{ background: "#020617" }}>
-      <span className="absolute left-3 top-3 h-2 w-3" style={{ background: "#f472b6" }} />
-      <span className="absolute left-10 top-3 h-2 w-3" style={{ background: "#f472b6" }} />
-      <span className="absolute right-3 top-3 h-2 w-3" style={{ background: "#f472b6" }} />
-      <span className="absolute left-3 top-9 h-2 w-3" style={{ background: "#4ade80" }} />
-      <span className="absolute left-10 top-9 h-2 w-3" style={{ background: "#4ade80" }} />
-      <span className="absolute right-3 top-9 h-2 w-3" style={{ background: "#4ade80" }} />
-      <span className="absolute left-1/2 top-14 h-3 w-px -translate-x-1/2" style={{ background: "#facc15" }} />
+      <span className="pv-slide-x absolute left-3 top-3 h-2 w-3" style={{ background: "#f472b6", ["--pv-d" as string]: "10px" }} />
+      <span className="pv-slide-x absolute left-10 top-3 h-2 w-3" style={{ background: "#f472b6", ["--pv-d" as string]: "10px" }} />
+      <span className="pv-slide-x absolute right-3 top-3 h-2 w-3" style={{ background: "#f472b6", ["--pv-d" as string]: "10px" }} />
+      <span className="pv-slide-x absolute left-3 top-9 h-2 w-3" style={{ background: "#4ade80", ["--pv-d" as string]: "10px" }} />
+      <span className="pv-slide-x absolute left-10 top-9 h-2 w-3" style={{ background: "#4ade80", ["--pv-d" as string]: "10px" }} />
+      <span className="pv-slide-x absolute right-3 top-9 h-2 w-3" style={{ background: "#4ade80", ["--pv-d" as string]: "10px" }} />
+      <span className="pv-rise absolute left-1/2 top-14 h-3 w-px -translate-x-1/2" style={{ background: "#facc15", ["--pv-from" as string]: "10px", ["--pv-to" as string]: "-50px" }} />
       <span className="absolute left-1/2 bottom-3 h-2 w-6 -translate-x-1/2" style={{ background: "#22d3ee" }} />
     </div>
   );
@@ -623,9 +629,9 @@ function TennisPreview() {
   return (
     <div className="relative h-24 w-32 border border-line" style={{ background: "#15803d" }}>
       <span className="absolute left-1/2 top-2 bottom-2 w-px" style={{ background: "rgba(255,255,255,0.5)" }} />
-      <span className="absolute left-2 top-1/3 h-8 w-1" style={{ background: "#ef4444" }} />
-      <span className="absolute right-2 bottom-1/3 h-8 w-1" style={{ background: "#3b82f6" }} />
-      <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: "#fde047" }} />
+      <span className="pv-bob absolute left-2 top-1/3 h-8 w-1" style={{ background: "#ef4444", ["--pv-d" as string]: "-14px" }} />
+      <span className="pv-bob absolute right-2 bottom-1/3 h-8 w-1" style={{ background: "#3b82f6", ["--pv-d" as string]: "14px" }} data-delay="2" />
+      <span className="pv-slide-x absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: "#fde047", ["--pv-d" as string]: "50px" }} />
     </div>
   );
 }
@@ -637,10 +643,10 @@ function PacmanPreview() {
       <span className="absolute left-2 top-2 bottom-2 w-1" style={{ background: "#3b82f6" }} />
       <span className="absolute right-2 top-2 bottom-2 w-1" style={{ background: "#3b82f6" }} />
       <span className="absolute left-2 right-2 bottom-2 h-1" style={{ background: "#3b82f6" }} />
-      <span className="absolute left-5 top-5 h-3 w-3 rounded-full" style={{ background: "#facc15" }} />
-      <span className="absolute right-5 top-1/2 h-3 w-3 rounded-t-full" style={{ background: "#ef4444" }} />
-      <span className="absolute left-1/2 bottom-5 h-1 w-1 -translate-x-1/2 rounded-full" style={{ background: "#22d3ee" }} />
-      <span className="absolute left-1/3 top-1/3 h-1 w-1 rounded-full" style={{ background: "#f472b6" }} />
+      <span className="pv-slide-x absolute left-5 top-5 h-3 w-3 rounded-full" style={{ background: "#facc15", ["--pv-d" as string]: "30px" }} />
+      <span className="pv-slide-x absolute right-5 top-1/2 h-3 w-3 rounded-t-full" style={{ background: "#ef4444", ["--pv-d" as string]: "-20px" }} data-delay="2" />
+      <span className="pv-pulse absolute left-1/2 bottom-5 h-1 w-1 -translate-x-1/2 rounded-full" style={{ background: "#22d3ee" }} />
+      <span className="pv-pulse absolute left-1/3 top-1/3 h-1 w-1 rounded-full" style={{ background: "#f472b6" }} data-delay="3" />
     </div>
   );
 }
@@ -666,7 +672,8 @@ function FlowFreePreview() {
       {Array.from({ length: 16 }).map((_, i) => (
         <span
           key={i}
-          className="h-4 w-4 rounded-sm border border-line"
+          className={`h-4 w-4 rounded-sm border border-line ${colorMap[i] ? "pv-flicker" : ""}`}
+          data-delay={colorMap[i] ? String((i % 5) + 1) : undefined}
           style={{ background: colorMap[i] }}
         />
       ))}
@@ -695,8 +702,8 @@ function TetrisPreview() {
       {cells.map((c, i) => (
         <span
           key={i}
-          className="h-3 w-3"
-          style={{ background: colors[c] ?? "var(--background)" }}
+          className={`h-3 w-3 ${i < 8 && c ? "pv-bob" : ""}`}
+          style={{ background: colors[c] ?? "var(--background)", ["--pv-d" as string]: "-6px" }}
         />
       ))}
     </div>
@@ -706,12 +713,12 @@ function TetrisPreview() {
 function VampireSurvivorsPreview() {
   return (
     <div className="relative h-24 w-32 border border-line" style={{ background: "#1e1b4b" }}>
-      <span className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: "#facc15", boxShadow: "0 0 8px #facc15" }} />
-      <span className="absolute left-3 top-3 h-2 w-2 rounded-full" style={{ background: "#ef4444" }} />
-      <span className="absolute right-4 top-6 h-2 w-2 rounded-full" style={{ background: "#ef4444" }} />
-      <span className="absolute left-8 bottom-3 h-2 w-2 rounded-full" style={{ background: "#a855f7" }} />
-      <span className="absolute right-3 bottom-5 h-2 w-2 rounded-full" style={{ background: "#a855f7" }} />
-      <span className="absolute left-1/2 top-1/2 h-px w-8 -translate-y-1/2" style={{ background: "linear-gradient(to right, #facc15, transparent)" }} />
+      <span className="pv-pulse absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: "#facc15", boxShadow: "0 0 8px #facc15" }} />
+      <span className="pv-pulse absolute left-3 top-3 h-2 w-2 rounded-full" style={{ background: "#ef4444" }} data-delay="1" />
+      <span className="pv-pulse absolute right-4 top-6 h-2 w-2 rounded-full" style={{ background: "#ef4444" }} data-delay="3" />
+      <span className="pv-pulse absolute left-8 bottom-3 h-2 w-2 rounded-full" style={{ background: "#a855f7" }} data-delay="2" />
+      <span className="pv-pulse absolute right-3 bottom-5 h-2 w-2 rounded-full" style={{ background: "#a855f7" }} data-delay="4" />
+      <span className="pv-flicker absolute left-1/2 top-1/2 h-px w-8 -translate-y-1/2" style={{ background: "linear-gradient(to right, #facc15, transparent)" }} />
     </div>
   );
 }

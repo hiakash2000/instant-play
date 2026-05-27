@@ -22,7 +22,7 @@ export default function Page() {
         Tap to flip the wheel. The road keeps building itself — stay on it.
       </p>
       <div className="mt-12">
-        <MobileFullscreen orientation="portrait">
+        <MobileFullscreen orientation="portrait" scorePlacement="below">
           <DriftBossGame />
         </MobileFullscreen>
       </div>

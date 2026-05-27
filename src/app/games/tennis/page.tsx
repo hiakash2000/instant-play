@@ -23,7 +23,7 @@ export default function Page() {
         ball speeds up every rally.
       </p>
       <div className="mt-12">
-        <MobileFullscreen orientation="landscape" scorePlacement="side">
+        <MobileFullscreen orientation="landscape">
           <TennisGame />
         </MobileFullscreen>
       </div>
