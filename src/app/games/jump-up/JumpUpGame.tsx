@@ -212,11 +212,10 @@ export default function JumpUpGame() {
   const onBoardPointerDown = useCallback(
     (e: React.PointerEvent<HTMLButtonElement>) => {
       e.preventDefault();
-      e.currentTarget.setPointerCapture(e.pointerId);
-      if (phaseRef.current !== "playing") {
-        start();
-        return;
-      }
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {}
+      if (phaseRef.current !== "playing") start();
       applyTouchDir(e);
     },
     [start, applyTouchDir],
